@@ -76,9 +76,7 @@ function check_metagear_home() {
     user_config_file=$HOME/.metagear/metagear.config
     user_env_file=$HOME/.metagear/metagear.env
 
-    if [ ! -d "$HOME/.metagear" ]; then
-
-        mkdir -p "$HOME/.metagear"
+    if [ ! -f $user_config_file ]; then
 
         echo "-----------------"
         echo "System resources:"
@@ -92,14 +90,36 @@ function check_metagear_home() {
 
         cp $1/templates/metagear.config $user_config_file
 
-        sed -i "s/max_memory = '[^']*GB'/max_memory = '${total_memory_gb}GB'/" "$user_config_file"
-        sed -i "s/max_cpus = [^']*/max_cpus = ${total_cpu_count}/" "$user_config_file"
-        sed -i "s|databases_root = \"/user/home/.metagear/databases\"|databases_root = \"$HOME/.metagear/databases\"|g" "$user_config_file"
+        # detect macOS vs Linux so we can pass the right -i flag
+        if [[ "$(uname)" == "Darwin" ]]; then
+        # macOS sed: -i requires a backup‐suffix, so we give it an empty one
+        SED_INPLACE=(-i '')
+        else
+        # GNU sed: -i works with no suffix
+        SED_INPLACE=(-i)
+        fi
+
+        # now the three edits, using a more precise regex for CPUs and escaping properly:
+
+        # 1) Update max_memory
+        sed "${SED_INPLACE[@]}" \
+            "s/^max_memory = '[0-9]\+\(\.[0-9]\+\)\?GB'/max_memory = '${total_memory_gb}GB'/" \
+            "$user_config_file"
+
+        # 2) Update max_cpus
+        sed "${SED_INPLACE[@]}" \
+            "s/^max_cpus = [0-9]\+/max_cpus = ${total_cpu_count}/" \
+            "$user_config_file"
+
+        # 3) Update databases_root (using | as delimiter so we don’t have to escape /)
+        sed "${SED_INPLACE[@]}" \
+            "s|^databases_root = \".*\"|databases_root = \"${HOME}/.metagear/databases\"|" \
+            "$user_config_file"
 
         cp $1/templates/metagear.env $user_env_file
 
         echo ""
-        echo "It seems this is the first timeMetaGEAR.."
+        echo "It seems this is the first time MetaGEAR runs in this system..."
         echo ""
         check_requirements
         echo ""
@@ -131,4 +151,3 @@ detect_container_tool() {
         exit 1
     fi
 }
-
