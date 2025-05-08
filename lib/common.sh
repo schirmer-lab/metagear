@@ -28,8 +28,9 @@ function usage() {
 
 
 function check_command {
+    echo "Checking command: $1"
     # Check if the command exists in the commands array
-    if [[ -z "${commands[$1]}" ]]; then
+    if ! [[ -v commands[$1] ]]; then
         echo "Error: Command '$1' not found."
         usage
         exit 1

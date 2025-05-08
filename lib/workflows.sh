@@ -36,7 +36,7 @@ function run_workflows() {
     local default_input_file="$LAUNCH_DIR/input_${workflow}.csv"
     local default_outdir="$LAUNCH_DIR/results"
 
-    while [[ "$1" != "" ]]; do
+    while (( $# > 0 )); do
         case "$1" in
             --input)
                 shift
@@ -69,9 +69,10 @@ function run_workflows() {
         fi
     fi
 
-    if [ -z "$outdir" ]; then
+    if [ -z "${outdir:-}" ]; then
         outdir="$default_outdir"
     fi
+
 
     mkdir -p "$outdir"
 
