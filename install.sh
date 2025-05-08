@@ -33,6 +33,12 @@ EXTRACTED_DIR="${INSTALL_DIR}/downloads/utilities"
 
 wget -qO "${UTILS_TMP_ZIP}" "${UTILS_ZIP_URL}"
 unzip -qo "${UTILS_TMP_ZIP}" -d "${EXTRACTED_DIR}"
+
+if [ -d "${INSTALL_DIR}/utilities" ]; then
+  echo "→ Removing old Utilities directory"
+  rm -rf "${INSTALL_DIR}/utilities"
+fi
+
 mv ${EXTRACTED_DIR}/metagear-utilities-main ${INSTALL_DIR}/utilities
 
 # 3) Download the tagged release
