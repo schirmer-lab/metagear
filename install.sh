@@ -7,7 +7,7 @@ INSTALL_DIR="${HOME}/.metagear"
 ORGANIZATION="schirmer-lab"
 PIPLINE_REPOSITORY="metagear-pipeline"
 PIPELINE_VERSION=0.1.0
-UTILS_REPOSITORY="metagear-utilities"
+UTILS_REPOSITORY="metagear"
 SCRIPT="main.sh"
 
 
@@ -45,7 +45,7 @@ if [ -d "${INSTALL_DIR}/utilities" ]; then
   rm -rf "${INSTALL_DIR}/utilities"
 fi
 
-mv ${UTILS_EXTRACTED_DIR}/metagear-utilities-main ${INSTALL_DIR}/utilities
+mv ${UTILS_EXTRACTED_DIR}/metagear-main ${INSTALL_DIR}/utilities
 
 # 3) Download the tagged release
 echo ""
