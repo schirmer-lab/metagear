@@ -25,23 +25,30 @@ WRAPPER_PATH="${PWD}/${WRAPPER_NAME}"
 mkdir -p "${INSTALL_DIR}"
 mkdir -p "${INSTALL_DIR}"/downloads
 
+# Welcome message
+echo "Welcome to the MetaGEAR installation script!"
+echo "This script will install MetaGEAR v${PIPELINE_VERSION} and its utilities."
+echo ""
+
 # 3) Install utilities
-echo "→ Installing MetaGEAR utilities..."
+echo "→ Downloading MetaGEAR utilities"
 UTILS_ZIP_URL="https://github.com/${ORGANIZATION}/${UTILS_REPOSITORY}/archive/refs/heads/main.zip"
 UTILS_TMP_ZIP="${INSTALL_DIR}/downloads/utilities.zip"
-EXTRACTED_DIR="${INSTALL_DIR}/downloads/utilities"
+UTILS_EXTRACTED_DIR="${INSTALL_DIR}/downloads/utilities"
 
 wget -qO "${UTILS_TMP_ZIP}" "${UTILS_ZIP_URL}"
-unzip -qo "${UTILS_TMP_ZIP}" -d "${EXTRACTED_DIR}"
+echo "→ Extracting to ${UTILS_EXTRACTED_DIR}"
+unzip -qo "${UTILS_TMP_ZIP}" -d "${UTILS_EXTRACTED_DIR}"
 
 if [ -d "${INSTALL_DIR}/utilities" ]; then
   echo "→ Removing old Utilities directory"
   rm -rf "${INSTALL_DIR}/utilities"
 fi
 
-mv ${EXTRACTED_DIR}/metagear-utilities-main ${INSTALL_DIR}/utilities
+mv ${UTILS_EXTRACTED_DIR}/metagear-utilities-main ${INSTALL_DIR}/utilities
 
 # 3) Download the tagged release
+echo ""
 echo "→ Downloading MetaGEAR v${PIPELINE_VERSION} from GitHub"
 wget -qO "${TMP_ZIP}" "${ZIP_URL}"
 
@@ -67,6 +74,7 @@ EOF
 chmod +x "${WRAPPER_PATH}"
 
 #7) Remove temporary files
+echo ""
 echo "→ Cleaning up"
 rm -rf "${INSTALL_DIR}/downloads"
 
@@ -75,5 +83,6 @@ rm -rf "${INSTALL_DIR}/downloads"
 echo
 echo "✔ Installed metagear v${PIPELINE_VERSION}"
 echo "  • Pipeline directory: ${PIPELINE_DIR}"
+echo "  • Utilities directory: ${INSTALL_DIR}/utilities"
 echo ""
 echo "You can now move '${WRAPPER_PATH}' into your PATH (e.g. /usr/local/bin) and run 'metagear'."
