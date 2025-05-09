@@ -1,8 +1,3 @@
----
-layout: default
-title: MetaGEAR
----
-
 # MetaGEAR
 
 MetaGEAR is an umbrella platform for high-throughput microbiome metagenomic analysis and interactive gene-function exploration. It consists of two main components:
