@@ -11,7 +11,7 @@ MetaGEAR is an umbrella platform for high-throughput microbiome metagenomic anal
   A Nextflow/NF-Core pipeline that streamlines end-to-end microbiome metagenomic workflows—from raw reads to functional annotation.
 
 - **MetaGEAR Web**
-  A web application enabling interactive exploration of microbial gene functions in Inflammatory Bowel Disease (IBD) and Colorectal Cancer (CRC). Results from MetaGEAR Pipeline can be uploaded for seamless integration.
+  A web server enabling interactive exploration of microbial gene functions in Inflammatory Bowel Disease (IBD) and Colorectal Cancer (CRC). Results from MetaGEAR Pipeline can be uploaded for seamless integration.
 
 ---
 
@@ -25,10 +25,9 @@ MetaGEAR is an umbrella platform for high-throughput microbiome metagenomic anal
 
 ### Prerequisites
 
-- Java 8+
-- Nextflow 20.10.0+
-- Docker or Singularity
-- ≥ 16 GB RAM (for medium-size datasets)
+- [Java 11+](https://ubuntu.com/tutorials/install-jre#2-installing-openjdk-jre)
+- [Nextflow 22+](https://www.nextflow.io/docs/latest/install.html#install-page)
+- [Docker](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository) or [Singularity](https://docs.sylabs.io/guides/3.0/user-guide/installation.html#install-the-debian-ubuntu-package-using-apt)
 
 ### Installation
 
@@ -54,13 +53,13 @@ metagear microbial_profiles --input=samples.csv
 The input file should look like this:
 ```
 sample,fastq_1,fastq_2
-SAMPLE-01,/path/to/fasta1_R1.fastq.gz,/path/to/fasta1_R2.fastq.gz
-SAMPLE-01,/path/to/fasta2_R1.fastq.gz,/path/to/fasta2_R2.fastq.gz
+SAMPLE-01,/path/to/sample1_R1.fastq.gz,/path/to/sample1_R2.fastq.gz
+SAMPLE-02,/path/to/sample2_R1.fastq.gz,/path/to/sample2_R2.fastq.gz
 ```
 
 ## 🌐 MetaGEAR Web
 
-Try it out live at: http://metagear.schirmerlab.de/
+Try it out live at: [http://metagear.schirmerlab.de](http://metagear.schirmerlab.de)
 
 MetaGEAR Web lets you:
 - Search microbial gene families by sequence or functional domains
