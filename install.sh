@@ -6,7 +6,7 @@ set -euo pipefail
 INSTALL_DIR="${HOME}/.metagear"
 ORGANIZATION="schirmer-lab"
 PIPLINE_REPOSITORY="metagear-pipeline"
-PIPELINE_VERSION=0.1.0
+PIPELINE_VERSION=0.1.1
 UTILS_REPOSITORY="metagear"
 SCRIPT="main.sh"
 
