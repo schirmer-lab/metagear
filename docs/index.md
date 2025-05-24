@@ -46,8 +46,8 @@ metagear download_databases
 
 To run the QC and Microbial Profiles workflows, run:
 ```bash
-metagear qc_dna --input=samples.csv
-metagear microbial_profiles --input=samples.csv
+metagear qc_dna --input samples.csv
+metagear microbial_profiles --input samples.csv
 ```
 
 The input file should look like this:
