@@ -57,6 +57,14 @@ SAMPLE-01,/path/to/sample1_R1.fastq.gz,/path/to/sample1_R2.fastq.gz
 SAMPLE-02,/path/to/sample2_R1.fastq.gz,/path/to/sample2_R2.fastq.gz
 ```
 
+### Running tests
+
+Run the Bats suite to ensure everything works as expected:
+
+```bash
+bats tests
+```
+
 ## 🌐 MetaGEAR Web
 
 Try it out live at: [http://metagear.schirmerlab.de](http://metagear.schirmerlab.de)
