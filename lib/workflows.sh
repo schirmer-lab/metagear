@@ -76,6 +76,12 @@ function run_workflows() {
 
     mkdir -p "$outdir"
 
-    echo "--workflow $workflow --input $default_input_file --outdir $outdir"
+    cmd="--workflow $workflow"
+    if [[ "${require_input[$workflow]}" == "true" ]]; then
+        cmd+=" --input $default_input_file"
+    fi
+    cmd+=" --outdir $outdir"
+
+    echo "$cmd"
 }
 
