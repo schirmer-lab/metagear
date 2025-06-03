@@ -5,13 +5,13 @@ set -euo pipefail
 # 1) Config
 INSTALL_DIR="${HOME}/.metagear"
 ORGANIZATION="schirmer-lab"
-PIPLINE_REPOSITORY="metagear-pipeline"
+PIPELINE_REPOSITORY="metagear-pipeline"
 PIPELINE_VERSION=0.1.1
 UTILS_REPOSITORY="metagear"
 SCRIPT="main.sh"
 
 
-ZIP_URL="https://github.com/${ORGANIZATION}/${PIPLINE_REPOSITORY}/archive/refs/tags/${PIPELINE_VERSION}.zip"
+ZIP_URL="https://github.com/${ORGANIZATION}/${PIPELINE_REPOSITORY}/archive/refs/tags/${PIPELINE_VERSION}.zip"
 TMP_ZIP="${INSTALL_DIR}/downloads/metagear-${PIPELINE_VERSION}.zip"
 
 EXTRACTED_DIR="${INSTALL_DIR}/downloads/v${PIPELINE_VERSION}"
@@ -61,7 +61,7 @@ fi
 # 5) Unzip into place
 echo "→ Extracting to ${EXTRACTED_DIR}"
 unzip -qo "${TMP_ZIP}" -d "${EXTRACTED_DIR}"
-mv ${EXTRACTED_DIR}/${PIPLINE_REPOSITORY}-${PIPELINE_VERSION} ${PIPELINE_DIR}
+mv ${EXTRACTED_DIR}/${PIPELINE_REPOSITORY}-${PIPELINE_VERSION} ${PIPELINE_DIR}
 
 ln -s ${PIPELINE_DIR} ${INSTALL_DIR}/latest
 
