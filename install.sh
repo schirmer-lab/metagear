@@ -85,4 +85,9 @@ echo "✔ Installed metagear v${PIPELINE_VERSION}"
 echo "  • Pipeline directory: ${PIPELINE_DIR}"
 echo "  • Utilities directory: ${INSTALL_DIR}/utilities"
 echo ""
-echo "You can now move '${WRAPPER_PATH}' into your PATH (e.g. /usr/local/bin) and run 'metagear'."
+YELLOW=$(tput setaf 3)
+RESET=$(tput sgr0)
+echo "${YELLOW}Next steps:${RESET}"
+echo "  • Move '${WRAPPER_PATH}' into a directory in your PATH (e.g. /usr/local/bin)"
+echo "  • Run './${WRAPPER_NAME}' once to create default configuration files"
+echo "  • Review ~/.metagear/metagear.config before running pipelines"

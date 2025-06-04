@@ -32,6 +32,8 @@ To install the Pipeline, just run:
 curl -L http://get-metagear.schirmerlab.de | bash
 ```
 
+After installing, execute `./metagear` once to generate default configuration files in `~/.metagear`. The installer sets resource limits to roughly 80% of your available CPUs and RAM (capped at 48 CPUs and 80 GB). Review `~/.metagear/metagear.config` before running any workflow.
+
 ### Usage
 
 MetaGEAR requires 3 databases: Kneaddata, MetaPhlAn, HUMAnN. These can be downloaded by running the command:
@@ -45,6 +47,8 @@ metagear qc_dna --input samples.csv
 metagear microbial_profiles --input samples.csv
 metagear qc_dna --input samples.csv -preview   # generate script only
 ```
+The `--input` parameter is required for these workflows. The output directory
+defaults to `./results` when `--outdir` is not specified.
 Running with `-preview` prints the generated script instead of executing it.
 For instance when running `metagear qc_dna --input samples.csv -preview`, a file `metagear_qc_dna.sh` is generated in the current directory and can
 be executed manually, or the command can be re-run without `-preview` to directly run the pipeline.

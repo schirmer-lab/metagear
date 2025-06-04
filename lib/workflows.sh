@@ -11,23 +11,6 @@ declare -A require_input=(
     [gene_call]="true"
 )
 
-# Prompt user with a default value if input is not provided.
-function prompt_for_required_file() {
-    local prompt_message="$1"
-
-    read -p "$prompt_message: " input
-
-    # Ask again if the input is empty or the file does not exist
-    while [[ -z "$input" || ! -f "$input" ]]; do
-        if [[ -f "$input" ]]; then
-            break
-        fi
-        read -p "Invalid input. $prompt_message: " input
-    done
-
-    echo "${input}"
-}
-
 
 function run_workflows() {
     workflow="$1"
@@ -56,19 +39,13 @@ function run_workflows() {
 
     # echo "require_input[$workflow] = ${require_input[$workflow]}"
 
-    # Only execute if the workflow is in the require_input array
+    # Require an input file for workflows that need one
     if [[ "${require_input[$workflow]}" == "true" ]]; then
-        if [ -z "$input_file" ]; then
-            # Check if file.txt exists in the current directory
-            if [ -f "$default_input_file" ]; then
-                input_file="$default_input_file"
-            else
-                input_file=$(prompt_for_required_file "Please provide a valid input file")
-                cp "$input_file" "$default_input_file"
-            fi
-        else
-            cp "$input_file" "$default_input_file"
+        if [ -z "${input_file:-}" ]; then
+            echo "Error: --input is required for $workflow workflow." >&2
+            exit 1
         fi
+        cp "$input_file" "$default_input_file"
     fi
 
     if [ -z "${outdir:-}" ]; then

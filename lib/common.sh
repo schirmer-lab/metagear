@@ -2,7 +2,8 @@
 
 SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 
-source $SCRIPT_DIR/lib/system_utils.sh
+# Load platform-specific utilities (Linux/macOS)
+source "$SCRIPT_DIR/system_utils.sh"
 
 
 declare -A commands=(
@@ -88,6 +89,17 @@ function check_metagear_home() {
         total_memory_gb=$(get_total_memory_gb)
         echo "Installed RAM: ${total_memory_gb} GB"
 
+        if (( total_cpu_count < 48 )) && (( $(printf '%.0f' "$total_memory_gb") < 80 )); then
+            default_cpu_count=$(( total_cpu_count * 80 / 100 ))
+            if (( default_cpu_count < 1 )); then
+                default_cpu_count=1
+            fi
+            default_memory_gb=$(awk -v mem="$total_memory_gb" 'BEGIN{printf "%.0f", mem*0.8}')
+        else
+            default_cpu_count=48
+            default_memory_gb=80
+        fi
+
         cp $HOME/.metagear/utilities/templates/metagear.config $user_config_file
 
         # detect macOS vs Linux so we can pass the right -i flag
@@ -103,12 +115,12 @@ function check_metagear_home() {
 
         # 1) Update max_memory
         sed "${SED_INPLACE[@]}" \
-            "s/^max_memory = '[0-9]\+\(\.[0-9]\+\)\?GB'/max_memory = '${total_memory_gb}GB'/" \
+            "s/^max_memory = '[0-9]\+\(\.[0-9]\+\)\?GB'/max_memory = '${default_memory_gb}GB'/" \
             "$user_config_file"
 
         # 2) Update max_cpus
         sed "${SED_INPLACE[@]}" \
-            "s/^max_cpus = [0-9]\+/max_cpus = ${total_cpu_count}/" \
+            "s/^max_cpus = [0-9]\+/max_cpus = ${default_cpu_count}/" \
             "$user_config_file"
 
         # 3) Update databases_root (using | as delimiter so we don’t have to escape /)
@@ -118,15 +130,20 @@ function check_metagear_home() {
 
         cp $HOME/.metagear/utilities/templates/metagear.env $user_env_file
 
+        GREEN=$(tput setaf 2)
+        YELLOW=$(tput setaf 3)
+        BOLD=$(tput bold)
+        RESET=$(tput sgr0)
+
         echo ""
-        echo "It seems this is the first time MetaGEAR runs in this system..."
+        echo "${GREEN}It seems this is the first time MetaGEAR runs in this system...${RESET}"
         echo ""
         check_requirements
         echo ""
         echo "   - User configuration was created in ~/.metagear/metagear.config"
         echo "   - Environment file was created in ~/.metagear/metagear.env"
         echo ""
-        echo "IMPORTANT: Please review these file before re-launching the MetaGEAR pipeline."
+        echo "${BOLD}${YELLOW}IMPORTANT: Review these files before re-launching the MetaGEAR pipeline.${RESET}"
         echo ""
 
         exit 0
