@@ -46,8 +46,8 @@ metagear microbial_profiles --input samples.csv
 metagear qc_dna --input samples.csv -preview   # generate script only
 ```
 Running with `-preview` prints the generated script instead of executing it.
-The file `metagear_qc_dna.sh` will be created in the current directory and can
-be executed manually or the command can be re-run without `-preview`.
+For instance when running `metagear qc_dna --input samples.csv -preview`, a file `metagear_qc_dna.sh` is generated in the current directory and can
+be executed manually, or the command can be re-run without `-preview` to directly run the pipeline.
 
 The input file should look like this:
 ```
