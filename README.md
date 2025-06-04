@@ -43,7 +43,11 @@ To run the QC and Microbial Profiles workflows, run:
 ```bash
 metagear qc_dna --input samples.csv
 metagear microbial_profiles --input samples.csv
+metagear qc_dna --input samples.csv -preview   # generate script only
 ```
+Running with `-preview` prints the generated script instead of executing it.
+The file `metagear_qc_dna.sh` will be created in the current directory and can
+be executed manually or the command can be re-run without `-preview`.
 
 The input file should look like this:
 ```
