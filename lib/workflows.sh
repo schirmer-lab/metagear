@@ -2,7 +2,7 @@
 
 SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 # Share parameter configuration with other scripts
-source "$SCRIPT_DIR/workflow_definitions.sh"
+source "$SCRIPT_DIR/lib/workflow_definitions.sh"
 
 LAUNCH_DIR="$PWD"
 

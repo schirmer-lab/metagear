@@ -4,7 +4,7 @@ SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 
 # Load platform-specific utilities (Linux/macOS)
 source "$SCRIPT_DIR/lib/system_utils.sh"
-source "$SCRIPT_DIR/lib/workflow_definitions.sh"
+source "$SCRIPT_DIR/workflow_definitions.sh"
 
 
 
