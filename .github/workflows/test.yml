@@ -19,4 +19,4 @@ jobs:
           bats-version: "1.11.0"
 
       - name: Run Bats tests
-        run: bats test/
+        run: bats tests
