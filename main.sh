@@ -48,7 +48,7 @@ custom_config_files=( $PIPELINE_DIR/conf/metagear/$COMMAND.config $HOME/.metagea
 metagear_config_files=( $PIPELINE_DIR/conf/metagear/*.config )
 all_config_files=( "${metagear_config_files[@]}" "${custom_config_files[@]}" )
 
-$UTILITIES_DIR/lib/merge_configuration.sh ${all_config_files[@]} > $LAUNCH_DIR/.metagear/$COMMAND.config
+$UTILITIES_DIR/lib/merge_configuration.sh ${all_config_files[@]} > $LAUNCH_DIR/$COMMAND.config
 
 nf_cmd_workflow_part=$(run_workflows $COMMAND "${REMAINING_ARGS[@]}")
 
@@ -57,7 +57,7 @@ cat $HOME/.metagear/metagear.env > $LAUNCH_DIR/metagear_$COMMAND.sh
 echo "" >> $LAUNCH_DIR/metagear_$COMMAND.sh
 echo "nextflow run $PIPELINE_DIR/main.nf \\
         $nf_cmd_workflow_part \\
-        -c $LAUNCH_DIR/.metagear/$COMMAND.config \\
+        -c $LAUNCH_DIR/$COMMAND.config \\
         \$RUN_PROFILES -w \\
         \$NF_WORK -resume" >> $LAUNCH_DIR/metagear_$COMMAND.sh
 echo "" >> $LAUNCH_DIR/metagear_$COMMAND.sh
