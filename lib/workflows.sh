@@ -54,6 +54,8 @@ function run_workflows() {
         shift
     done
 
+    # echo "require_input[$workflow] = ${require_input[$workflow]}"
+
     # Only execute if the workflow is in the require_input array
     if [[ "${require_input[$workflow]}" == "true" ]]; then
         if [ -z "$input_file" ]; then
@@ -78,7 +80,7 @@ function run_workflows() {
 
     cmd="--workflow $workflow"
     if [[ "${require_input[$workflow]}" == "true" ]]; then
-        cmd+=" --input $default_input_file"
+        cmd+=" --input $input_file"
     fi
     cmd+=" --outdir $outdir"
 
