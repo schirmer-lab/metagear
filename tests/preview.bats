@@ -14,11 +14,18 @@ teardown() {
   rm -rf "$TEST_HOME"
 }
 
-@test "main.sh preview outputs script" {
+@test "qc_dna preview outputs script" {
   cd "$BATS_TMPDIR"
   echo -e "sample,fastq_1,fastq_2\nS1,a,b" > test.csv
   run "$BATS_TEST_DIRNAME/../main.sh" qc_dna --input test.csv -preview
   [ -f metagear_qc_dna.sh ]
   [[ "$output" == *"Preview mode"* ]]
   [[ "$output" == *"metagear_qc_dna.sh"* ]]
+}
+
+@test "qc_dna invalid option --random_param" {
+  cd "$BATS_TMPDIR"
+  echo -e "sample,fastq_1,fastq_2\nS1,a,b" > test.csv
+  run "$BATS_TEST_DIRNAME/../main.sh" qc_dna --random_param value --input test.csv -preview
+  [[ "$output" == "Invalid option: --random_param for qc_dna workflow." ]]
 }
