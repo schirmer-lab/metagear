@@ -29,3 +29,11 @@ The bulk of the functionality is implemented in Bash. `main.sh` calls the helper
 1. Install [Bats](https://bats-core.readthedocs.io/).
 2. Run `bats tests` to ensure helper functions behave as expected.
 3. Modify the scripts in `lib/` or the wrapper as needed.
+
+### Local pipeline development
+
+Developers can point the `latest` symlink to a local checkout of
+`metagear-pipeline` by passing the `--dev /path/to/pipeline` option to
+`install.sh`. The script still downloads the tagged pipeline version, but the
+`latest` link will reference the provided directory instead, allowing the
+wrapper to execute your local code.
