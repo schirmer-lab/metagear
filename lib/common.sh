@@ -4,15 +4,9 @@ SCRIPT_DIR="$(dirname "$(realpath "$0")")"
 
 # Load platform-specific utilities (Linux/macOS)
 source "$SCRIPT_DIR/lib/system_utils.sh"
+source "$SCRIPT_DIR/lib/workflow_definitions.sh"
 
 
-declare -A commands=(
-    [download_databases]="Install Databases (Kneaddata, Metaphlan, Humann)"
-    [qc_dna]="Quality Control for DNA"
-    [qc_rna]="Quality Control for RNA"
-    [microbial_profiles]="Get microbial profiles with Metaphlan and Humann"
-    [gene_call]="Assemble contigs and predict genes with Megahit and Prodigal"
-)
 
 
 # Usage message
@@ -20,8 +14,10 @@ function usage() {
     echo ""
     echo "Usage: metagear <command> [options]"
     echo "Commands:"
-    for cmd in "${!commands[@]}"; do
-        printf "  %-20s %s\n" "$cmd" "${commands[$cmd]}."
+    for cmd in "${!workflow_definitions[@]}"; do
+        desc="${workflow_definitions[$cmd]}"
+        desc="${desc%%|*}"
+        printf "  %-20s %s\n" "$cmd" "$desc."
     done
     echo ""
     exit 1
@@ -29,8 +25,8 @@ function usage() {
 
 
 function check_command {
-    # Check if the command exists in the commands array
-    if ! [[ -v commands[$1] ]]; then
+    # Check if the command exists in the workflow_definitions array
+    if ! [[ -v workflow_definitions[$1] ]]; then
         echo "Error: Command '$1' not found."
         usage
         exit 1
