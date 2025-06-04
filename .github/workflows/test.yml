@@ -10,10 +10,13 @@ jobs:
   test:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
-      - name: Install Bats
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y bats
-      - name: Run test suite
-        run: bats tests
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Install Bats 1.11
+        uses: bats-core/bats-action@main
+        with:
+          bats-version: "1.11.0"
+
+      - name: Run Bats tests
+        run: bats test/
