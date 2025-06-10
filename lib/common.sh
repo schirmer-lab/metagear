@@ -73,8 +73,8 @@ check_requirements() {
 
 function check_metagear_home() {
 
-    user_config_file=$HOME/.metagear/metagear.config
-    user_env_file=$HOME/.metagear/metagear.env
+    user_config_file=$METAGEAR_DIR/metagear.config
+    user_env_file=$METAGEAR_DIR/metagear.env
 
     if [ ! -f $user_config_file ]; then
 
@@ -88,7 +88,7 @@ function check_metagear_home() {
         total_memory_gb=$(get_total_memory_gb)
         echo "Installed RAM: ${total_memory_gb} GB"
 
-        cp $HOME/.metagear/utilities/templates/metagear.config $user_config_file
+        cp $METAGEAR_DIR/utilities/templates/metagear.config $user_config_file
 
         # detect macOS vs Linux so we can pass the right -i flag
         if [[ "$(uname)" == "Darwin" ]]; then
@@ -116,7 +116,7 @@ function check_metagear_home() {
             "s|^databases_root = \".*\"|databases_root = \"${HOME}/.metagear/databases\"|" \
             "$user_config_file"
 
-        cp $HOME/.metagear/utilities/templates/metagear.env $user_env_file
+        cp $METAGEAR_DIR/utilities/templates/metagear.env $user_env_file
 
         echo ""
         echo "It seems this is the first time MetaGEAR runs in this system..."
