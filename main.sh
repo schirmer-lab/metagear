@@ -9,7 +9,8 @@ fi
 
 # Resolve script directory and source common functions
 UTILITIES_DIR="$(dirname "$(realpath "$0")")"
-PIPELINE_DIR="$HOME/.metagear/latest"
+METAGEAR_DIR="$(dirname "$UTILITIES_DIR")"
+PIPELINE_DIR="$METAGEAR_DIR/latest"
 LAUNCH_DIR="$PWD"
 
 source "${UTILITIES_DIR}/lib/common.sh"
@@ -29,7 +30,7 @@ check_command "$COMMAND"
 
 mkdir -p $LAUNCH_DIR/.metagear
 
-custom_config_files=( $PIPELINE_DIR/conf/metagear/$COMMAND.config $HOME/.metagear/metagear.config )
+custom_config_files=( $PIPELINE_DIR/conf/metagear/$COMMAND.config $METAGEAR_DIR/metagear.config )
 metagear_config_files=( $PIPELINE_DIR/conf/metagear/*.config )
 all_config_files=( "${metagear_config_files[@]}" "${custom_config_files[@]}" )
 
@@ -37,7 +38,7 @@ $UTILITIES_DIR/lib/merge_configuration.sh ${all_config_files[@]} > $LAUNCH_DIR/.
 
 nf_cmd_workflow_part=$(run_workflows $COMMAND $@)
 
-cat $HOME/.metagear/metagear.env > $LAUNCH_DIR/metagear_$COMMAND.sh
+cat $METAGEAR_DIR/metagear.env > $LAUNCH_DIR/metagear_$COMMAND.sh
 
 echo "" >> $LAUNCH_DIR/metagear_$COMMAND.sh
 echo "nextflow run $PIPELINE_DIR/main.nf \\
