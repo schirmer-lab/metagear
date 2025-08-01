@@ -1,17 +1,10 @@
 #!/usr/bin/env bash
 
-SCRIPT_DIR="$(dirname "$(realpath "$0")")"
-METAGEAR_DIR="$(dirname "$SCRIPT_DIR")"
+# INSTALL_DIR is set in environment.
 
 # Load platform-specific utilities (Linux/macOS)
-source "$SCRIPT_DIR/lib/system_utils.sh"
-source "$SCRIPT_DIR/workflow_definitions.sh"
-<<<<<<< HEAD
-=======
-
-
->>>>>>> ac59ce5 (Gene analysis (#19))
-
+source "$INSTALL_DIR/utilities/lib/system_utils.sh"
+source "$INSTALL_DIR/utilities/lib/workflow_definitions.sh"
 
 # Usage message
 function usage() {
@@ -74,8 +67,8 @@ check_requirements() {
 
 function check_metagear_home() {
 
-    user_config_file=$METAGEAR_DIR/metagear.config
-    user_env_file=$METAGEAR_DIR/metagear.env
+    user_config_file=$INSTALL_DIR/metagear.config
+    user_env_file=$INSTALL_DIR/metagear.env
 
     if [ ! -f $user_config_file ]; then
 
@@ -100,7 +93,7 @@ function check_metagear_home() {
             default_memory_gb=80
         fi
 
-        cp $METAGEAR_DIR/utilities/templates/metagear.config $user_config_file
+        cp $INSTALL_DIR/utilities/templates/metagear.config $user_config_file
 
         # detect macOS vs Linux so we can pass the right -i flag
         if [[ "$(uname)" == "Darwin" ]]; then
@@ -125,10 +118,12 @@ function check_metagear_home() {
 
         # 3) Update databases_root (using | as delimiter so we don’t have to escape /)
         sed "${SED_INPLACE[@]}" \
-            "s|^databases_root = \".*\"|databases_root = \"${$METAGEAR_DIR}/databases\"|" \
+            "s|^databases_root = \".*\"|databases_root = \"${INSTALL_DIR}/databases\"|" \
             "$user_config_file"
 
-        cp $METAGEAR_DIR/utilities/templates/metagear.env $user_env_file
+        # export INSTALL_DIR=$INSTALL_DIR
+        # cp $INSTALL_DIR/utilities/templates/metagear.env $user_env_file
+        envsubst < $INSTALL_DIR/utilities/templates/metagear.env > $user_env_file
 
         GREEN=$(tput setaf 2)
         YELLOW=$(tput setaf 3)
@@ -145,14 +140,13 @@ function check_metagear_home() {
         echo ""
         check_requirements
         echo ""
-        echo "   - User configuration was created in ${$METAGEAR_DIR}/metagear.config"
-        echo "   - Environment file was created in ${$METAGEAR_DIR}/metagear.env"
+        echo "   - User configuration was created in $INSTALL_DIR/metagear.config"
+        echo "   - Environment file was created in $INSTALL_DIR/metagear.env"
         echo ""
         echo "${BOLD}${YELLOW}IMPORTANT: Review these files before re-launching the MetaGEAR pipeline.${RESET}"
         echo ""
 
         exit 0
-
     fi
 
 }

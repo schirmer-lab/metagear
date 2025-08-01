@@ -33,7 +33,31 @@ The bulk of the functionality is implemented in Bash. `main.sh` calls the helper
 ### Local pipeline development
 
 Developers can point the `latest` symlink to a local checkout of
-`metagear-pipeline` by passing the `--dev /path/to/pipeline` option to
+`metagear-pipeline` by passing the `--pipeline /path/to/pipeline` option to
 `install.sh`. The script still downloads the tagged pipeline version, but the
 `latest` link will reference the provided directory instead, allowing the
 wrapper to execute your local code.
+
+## Installation Parameters
+
+The `install.sh` script accepts the following optional parameters:
+
+- `--install-dir <path>` – Specify a custom installation directory (default: `~/.metagear`)
+- `--pipeline <path>` – Use a local pipeline directory for development instead of downloading from GitHub
+- `--utilities <path>` – Use a custom utilities repository path instead of the default repository
+
+### Examples
+
+```bash
+# Install to a custom directory
+./install.sh --install-dir /opt/metagear
+
+# Use a local pipeline for development
+./install.sh --pipeline /home/user/metagear-pipeline
+
+# Use custom utilities and pipeline paths
+./install.sh --utilities /home/user/custom-utils --pipeline /home/user/custom-pipeline
+
+# Combine custom installation directory with local development
+./install.sh --install-dir /tmp/metagear-test --pipeline /home/user/metagear-pipeline
+```

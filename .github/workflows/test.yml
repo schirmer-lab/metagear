@@ -19,4 +19,6 @@ jobs:
           bats-version: "1.11.0"
 
       - name: Run Bats tests
-        run: bats tests
+        run: bats tests --print-output-on-failure
+        env:
+          TERM: xterm
