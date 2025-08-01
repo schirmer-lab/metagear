@@ -114,8 +114,8 @@ for file in "$@"; do
 
         elif [ "$current_section" = "process" ]; then
             if echo "$trimmed" | grep -q '^withName:'; then
-                # Extract block name using sed; supports optional quotes
-                block_name=$(echo "$trimmed" | sed -E "s/^withName:[[:space:]]*['\"]?([^'\"]+)['\"]?[[:space:]]*\{.*/\1/")
+                # Extract block name (supports both withName and withLabel, optional quotes)
+                block_name=$(echo "$trimmed" | sed -E "s/^with(Name|Label):[[:space:]]*['\"]?([^'\"]+)['\"]?[[:space:]]*\{.*/\2/")
                 block_content="$line"$'\n'
                 open_braces=$(echo "$line" | grep -o "{" | wc -l)
                 close_braces=$(echo "$line" | grep -o "}" | wc -l)
