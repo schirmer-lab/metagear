@@ -1,32 +1,11 @@
 #!/usr/bin/env bash
-# lib/common.sh
+
+SCRIPT_DIR="$(dirname "$(realpath "$0")")"
+# Share parameter configuration with other scripts
+source "$SCRIPT_DIR/lib/workflow_definitions.sh"
 
 LAUNCH_DIR="$PWD"
 
-declare -A require_input=(
-    [download_databases]="false"
-    [qc_dna]="true"
-    [qc_rna]="true"
-    [microbial_profiles]="true"
-    [gene_call]="true"
-)
-
-# Prompt user with a default value if input is not provided.
-function prompt_for_required_file() {
-    local prompt_message="$1"
-
-    read -p "$prompt_message: " input
-
-    # Ask again if the input is empty or the file does not exist
-    while [[ -z "$input" || ! -f "$input" ]]; do
-        if [[ -f "$input" ]]; then
-            break
-        fi
-        read -p "Invalid input. $prompt_message: " input
-    done
-
-    echo "${input}"
-}
 
 
 function run_workflows() {
@@ -34,48 +13,83 @@ function run_workflows() {
     shift
 
     local default_input_file="$LAUNCH_DIR/input_${workflow}.csv"
-    local default_outdir="$LAUNCH_DIR/results"
+
+    # Parse the parameter specification for this workflow
+    def="${workflow_definitions[$workflow]}"
+    params="${def#*|}"
+    params="${params## }"
+    read -ra tokens <<< "$params"
+    local allowed=()
+    local required=()
+    declare -A defaults=()
+    for t in "${tokens[@]}"; do
+        local param="$t"
+        local is_required=false
+        if [[ $param == *\* ]]; then
+            param="${param%\*}"  # remove trailing '*'
+            is_required=true
+        fi
+        local regex='^([A-Za-z_]+)\(([^)]+)\)$'
+        if [[ $param =~ $regex ]]; then
+            param="${BASH_REMATCH[1]}"
+            defaults[$param]="${BASH_REMATCH[2]}"
+        fi
+        allowed+=("$param")
+        $is_required && required+=("$param")
+    done
+
+    declare -A values=()
 
     while (( $# > 0 )); do
         case "$1" in
-            --input)
+            --*)
+                param="${1#--}"
                 shift
-                input_file="$1"
-                ;;
-            --outdir)
-                shift
-                outdir="$1"
+                value="$1"
+                if [[ ! " ${allowed[@]} " =~ " ${param} " ]]; then
+                    echo "Invalid option: --$param for $workflow workflow." >&2
+                    usage
+                fi
+                values[$param]="$value"
                 ;;
             *)
-                echo "Invalid option: $1"
+                echo "Invalid option: $1" >&2
                 usage
                 ;;
         esac
         shift
     done
 
-    # Only execute if the workflow is in the require_input array
-    if [[ "${require_input[$workflow]}" == "true" ]]; then
-        if [ -z "$input_file" ]; then
-            # Check if file.txt exists in the current directory
-            if [ -f "$default_input_file" ]; then
-                input_file="$default_input_file"
-            else
-                input_file=$(prompt_for_required_file "Please provide a valid input file")
-                cp "$input_file" "$default_input_file"
-            fi
-        else
-            cp "$input_file" "$default_input_file"
+    for req in "${required[@]}"; do
+        if [ -z "${values[$req]:-}" ]; then
+            echo "Error: --$req is required for $workflow workflow." >&2
+            exit 1
         fi
-    fi
+    done
 
-    if [ -z "${outdir:-}" ]; then
-        outdir="$default_outdir"
-    fi
+    for param in "${allowed[@]}"; do
+        if [ -z "${values[$param]:-}" ] && [ -n "${defaults[$param]:-}" ]; then
+            values[$param]="${defaults[$param]}"
+        fi
+    done
 
+    local outdir="${values[outdir]:-${defaults[outdir]}}"
+
+    if [[ " ${allowed[@]} " =~ " input " ]] && [ -n "${values[input]:-}" ]; then
+        cp "${values[input]}" "$default_input_file"
+    fi
 
     mkdir -p "$outdir"
 
-    echo "--workflow $workflow --input $default_input_file --outdir $outdir"
+    cmd="--workflow $workflow"
+    for param in "${allowed[@]}"; do
+        [[ "$param" == "outdir" ]] && continue
+        if [ -n "${values[$param]:-}" ]; then
+            cmd+=" --$param ${values[$param]}"
+        fi
+    done
+    cmd+=" --outdir $outdir"
+
+    echo "$cmd"
 }
 

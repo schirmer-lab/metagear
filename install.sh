@@ -5,13 +5,13 @@ set -euo pipefail
 # 1) Config
 INSTALL_DIR="${HOME}/.metagear"
 ORGANIZATION="schirmer-lab"
-PIPLINE_REPOSITORY="metagear-pipeline"
+PIPELINE_REPOSITORY="metagear-pipeline"
 PIPELINE_VERSION=0.1.1
 UTILS_REPOSITORY="metagear"
 SCRIPT="main.sh"
 
 
-ZIP_URL="https://github.com/${ORGANIZATION}/${PIPLINE_REPOSITORY}/archive/refs/tags/${PIPELINE_VERSION}.zip"
+ZIP_URL="https://github.com/${ORGANIZATION}/${PIPELINE_REPOSITORY}/archive/refs/tags/${PIPELINE_VERSION}.zip"
 TMP_ZIP="${INSTALL_DIR}/downloads/metagear-${PIPELINE_VERSION}.zip"
 
 EXTRACTED_DIR="${INSTALL_DIR}/downloads/v${PIPELINE_VERSION}"
@@ -19,6 +19,28 @@ PIPELINE_DIR="${INSTALL_DIR}/v${PIPELINE_VERSION}"
 
 WRAPPER_NAME="metagear"
 WRAPPER_PATH="${PWD}/${WRAPPER_NAME}"
+
+# Optional development pipeline path
+DEV_PATH=""
+
+# Parse optional arguments
+while [[ $# -gt 0 ]]; do
+  case "$1" in
+    --dev)
+      shift
+      if [[ $# -eq 0 ]]; then
+        echo "Error: --dev requires a path argument" >&2
+        exit 1
+      fi
+      DEV_PATH="$(realpath "$1")"
+      shift
+      ;;
+    *)
+      echo "Unknown option: $1" >&2
+      exit 1
+      ;;
+  esac
+done
 
 
 # 2) Prepare install directory
@@ -61,9 +83,21 @@ fi
 # 5) Unzip into place
 echo "→ Extracting to ${EXTRACTED_DIR}"
 unzip -qo "${TMP_ZIP}" -d "${EXTRACTED_DIR}"
-mv ${EXTRACTED_DIR}/${PIPLINE_REPOSITORY}-${PIPELINE_VERSION} ${PIPELINE_DIR}
+mv ${EXTRACTED_DIR}/${PIPELINE_REPOSITORY}-${PIPELINE_VERSION} ${PIPELINE_DIR}
 
-ln -s ${PIPELINE_DIR} ${INSTALL_DIR}/latest
+if [[ -e "${INSTALL_DIR}/latest" || -L "${INSTALL_DIR}/latest" ]]; then
+  rm -rf "${INSTALL_DIR}/latest"
+fi
+
+TARGET="${PIPELINE_DIR}"
+if [[ -n "${DEV_PATH}" ]]; then
+  if [[ ! -d "${DEV_PATH}" ]]; then
+    echo "Error: Dev pipeline directory '${DEV_PATH}' does not exist" >&2
+    exit 1
+  fi
+  TARGET="${DEV_PATH}"
+fi
+ln -s "${TARGET}" "${INSTALL_DIR}/latest"
 
 
 # 6) Create the relocatable wrapper
@@ -84,5 +118,11 @@ echo
 echo "✔ Installed metagear v${PIPELINE_VERSION}"
 echo "  • Pipeline directory: ${PIPELINE_DIR}"
 echo "  • Utilities directory: ${INSTALL_DIR}/utilities"
+echo "  • Latest link points to: ${TARGET}"
 echo ""
-echo "You can now move '${WRAPPER_PATH}' into your PATH (e.g. /usr/local/bin) and run 'metagear'."
+YELLOW=$(tput setaf 3)
+RESET=$(tput sgr0)
+echo "${YELLOW}Next steps:${RESET}"
+echo "  • Move '${WRAPPER_PATH}' into a directory in your PATH (e.g. /usr/local/bin)"
+echo "  • Run './${WRAPPER_NAME}' once to create default configuration files"
+echo "  • Review ~/.metagear/metagear.config before running pipelines"
