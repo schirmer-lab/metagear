@@ -1,13 +1,145 @@
 #!/usr/bin/env bash
 # Workflow parameter and description configuration shared by CLI scripts
 
-# Each entry lists a human-readable description followed by its parameters.
-# A trailing '*' marks a required parameter and '(value)' gives a default.
+# Get the directory where this script is located
+SCRIPT_DIR="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
+JSON_DEFINITIONS_FILE="$SCRIPT_DIR/workflow_definitions.json"
 
-declare -A workflow_definitions=(
-    [download_databases]="Install Databases (Kneaddata, MetaPhlAn, HUMAnN) | outdir(results)"
-    [qc_dna]="Quality Control for DNA | input* outdir(results)"
-    [qc_rna]="Quality Control for RNA | input* outdir(results)"
-    [microbial_profiles]="Get microbial profiles with MetaPhlAn and HUMAnN | input* outdir(results)"
-    [gene_analysis]="Gene centric analysis workflow | input* catalog outdir(results)"
-)
+# Factory-style loader for JSON parser implementations
+# Load appropriate JSON parser based on availability (jq takes priority)
+if [ -f "$SCRIPT_DIR/json_parser_jq.sh" ]; then
+    source "$SCRIPT_DIR/json_parser_jq.sh"
+    if check_jq_available; then
+        JSON_PARSER="jq"
+    fi
+fi
+
+if [ -z "${JSON_PARSER:-}" ] && [ -f "$SCRIPT_DIR/json_parser_python.sh" ]; then
+    source "$SCRIPT_DIR/json_parser_python.sh"
+    if check_python_available; then
+        JSON_PARSER="python"
+    fi
+fi
+
+# Error if no parser is available
+if [ -z "${JSON_PARSER:-}" ]; then
+    echo "Error: Neither 'jq' nor 'python3' is available for JSON parsing." >&2
+    echo "Please install one of them to use JSON workflow definitions." >&2
+    exit 1
+fi
+
+# Function to validate workflow and parameters
+validate_workflow_and_parameters() {
+    local workflow_name="$1"
+    shift
+    local -A provided_params=()
+    local -A allowed_params=()
+    local -A required_params=()
+    local -A default_values=()
+
+    # Check if workflow exists
+    if ! workflow_exists "$workflow_name"; then
+        echo "Error: Workflow '$workflow_name' not found." >&2
+        return 1
+    fi
+
+    # Parse provided parameters
+    while (( $# > 0 )); do
+        case "$1" in
+            --*)
+                local param="${1#--}"
+                shift
+                if (( $# == 0 )); then
+                    echo "Error: Option --$param requires a value." >&2
+                    return 1
+                fi
+                provided_params["$param"]="$1"
+                ;;
+            *)
+                echo "Error: Invalid option: $1" >&2
+                return 1
+                ;;
+        esac
+        shift
+    done
+
+    # Load global parameters
+    while IFS= read -r param_json; do
+        [ -z "$param_json" ] && continue
+        local name required default desc
+        name=$(get_parameter_field "$param_json" "name")
+        required=$(get_parameter_field "$param_json" "required")
+        default=$(get_parameter_field "$param_json" "default")
+
+        [ -n "$name" ] || continue
+        allowed_params["$name"]=1
+        [ "$required" = "true" ] && required_params["$name"]=1
+        [ -n "$default" ] && default_values["$name"]="$default"
+    done < <(get_global_parameters)
+
+    # Load workflow-specific parameters
+    while IFS= read -r param_json; do
+        [ -z "$param_json" ] && continue
+        local name required default desc
+        name=$(get_parameter_field "$param_json" "name")
+        required=$(get_parameter_field "$param_json" "required")
+        default=$(get_parameter_field "$param_json" "default")
+
+        [ -n "$name" ] || continue
+        allowed_params["$name"]=1
+        [ "$required" = "true" ] && required_params["$name"]=1
+        [ -n "$default" ] && default_values["$name"]="$default"
+    done < <(get_workflow_parameters "$workflow_name")
+
+    # Validate provided parameters
+    for param in "${!provided_params[@]}"; do
+        if [[ ! -v allowed_params["$param"] ]]; then
+            echo "Error: Invalid option: --$param for $workflow_name workflow." >&2
+            return 1
+        fi
+    done
+
+    # Check required parameters
+    for param in "${!required_params[@]}"; do
+        if [[ ! -v provided_params["$param"] ]]; then
+            echo "Error: --$param is required for $workflow_name workflow." >&2
+            return 1
+        fi
+    done
+
+    # Output final parameter values (provided + defaults)
+    local -A final_params=()
+
+    # Start with defaults
+    for param in "${!default_values[@]}"; do
+        final_params["$param"]="${default_values[$param]}"
+    done
+
+    # Override with provided values
+    for param in "${!provided_params[@]}"; do
+        final_params["$param"]="${provided_params[$param]}"
+    done
+
+    # Output parameters in format: param=value
+    for param in "${!final_params[@]}"; do
+        echo "$param=${final_params[$param]}"
+    done
+
+    return 0
+}
+
+# Function to get workflow list for usage display
+get_workflow_list() {
+    if [ -f "$JSON_DEFINITIONS_FILE" ]; then
+        # Use JSON definitions
+        while IFS= read -r workflow; do
+            [ -z "$workflow" ] && continue
+            local desc
+            desc=$(get_workflow_description "$workflow")
+            printf "  %-20s %s\n" "$workflow" "$desc"
+        done < <(get_available_workflows)
+    else
+        echo "Error: workflow definitions file not found at $JSON_DEFINITIONS_FILE" >&2
+        return 1
+    fi
+}

@@ -11,21 +11,22 @@ function usage() {
     echo ""
     echo "Usage: metagear <command> [options]"
     echo "Commands:"
-    for cmd in "${!workflow_definitions[@]}"; do
-        desc="${workflow_definitions[$cmd]}"
-        desc="${desc%%|*}"
-        printf "  %-20s %s\n" "$cmd" "$desc."
-    done
+    get_workflow_list
     echo ""
     exit 1
 }
 
 
 function check_command {
-    # Check if the command exists in the workflow_definitions array
-    if ! [[ -v workflow_definitions[$1] ]]; then
-        echo "Error: Command '$1' not found."
-        usage
+    # Check if the command exists in the JSON workflow definitions
+    if [ -f "$INSTALL_DIR/utilities/lib/workflow_definitions.json" ]; then
+        if ! workflow_exists "$1"; then
+            echo "Error: Command '$1' not found."
+            usage
+            exit 1
+        fi
+    else
+        echo "Error: workflow definitions file not found." >&2
         exit 1
     fi
 }

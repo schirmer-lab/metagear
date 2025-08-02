@@ -6,83 +6,45 @@ source "$SCRIPT_DIR/lib/workflow_definitions.sh"
 
 LAUNCH_DIR="$PWD"
 
-
-
 function run_workflows() {
     workflow="$1"
     shift
 
     local default_input_file="$LAUNCH_DIR/input_${workflow}.csv"
 
-    # Parse the parameter specification for this workflow
-    def="${workflow_definitions[$workflow]}"
-    params="${def#*|}"
-    params="${params## }"
-    read -ra tokens <<< "$params"
-    local allowed=()
-    local required=()
-    declare -A defaults=()
-    for t in "${tokens[@]}"; do
-        local param="$t"
-        local is_required=false
-        if [[ $param == *\* ]]; then
-            param="${param%\*}"  # remove trailing '*'
-            is_required=true
+    # Check if JSON definitions are available
+    if [ -f "$JSON_DEFINITIONS_FILE" ]; then
+        # Use JSON-based validation
+        local validation_result
+        if ! validation_result=$(validate_workflow_and_parameters "$workflow" "$@"); then
+            echo "$validation_result" >&2
+            usage
         fi
-        local regex='^([A-Za-z_]+)\(([^)]+)\)$'
-        if [[ $param =~ $regex ]]; then
-            param="${BASH_REMATCH[1]}"
-            defaults[$param]="${BASH_REMATCH[2]}"
-        fi
-        allowed+=("$param")
-        $is_required && required+=("$param")
-    done
 
-    declare -A values=()
+        # Parse validated parameters
+        declare -A values=()
+        while IFS='=' read -r param value; do
+            [ -n "$param" ] && values["$param"]="$value"
+        done <<< "$validation_result"
 
-    while (( $# > 0 )); do
-        case "$1" in
-            --*)
-                param="${1#--}"
-                shift
-                value="$1"
-                if [[ ! " ${allowed[@]} " =~ " ${param} " ]]; then
-                    echo "Invalid option: --$param for $workflow workflow." >&2
-                    usage
-                fi
-                values[$param]="$value"
-                ;;
-            *)
-                echo "Invalid option: $1" >&2
-                usage
-                ;;
-        esac
-        shift
-    done
+    else
+        echo "Error: workflow definitions file not found at $JSON_DEFINITIONS_FILE" >&2
+        echo "JSON-based workflow definitions are required." >&2
+        exit 1
+    fi
 
-    for req in "${required[@]}"; do
-        if [ -z "${values[$req]:-}" ]; then
-            echo "Error: --$req is required for $workflow workflow." >&2
-            exit 1
-        fi
-    done
+    local outdir="${values[outdir]:-results}"
 
-    for param in "${allowed[@]}"; do
-        if [ -z "${values[$param]:-}" ] && [ -n "${defaults[$param]:-}" ]; then
-            values[$param]="${defaults[$param]}"
-        fi
-    done
-
-    local outdir="${values[outdir]:-${defaults[outdir]}}"
-
-    if [[ " ${allowed[@]} " =~ " input " ]] && [ -n "${values[input]:-}" ]; then
+    # Handle input parameter if present
+    if [[ -v values[input] ]] && [ -n "${values[input]:-}" ]; then
         cp "${values[input]}" "$default_input_file"
     fi
 
     mkdir -p "$outdir"
 
+    # Build the command
     cmd="--workflow $workflow"
-    for param in "${allowed[@]}"; do
+    for param in "${!values[@]}"; do
         [[ "$param" == "outdir" ]] && continue
         if [ -n "${values[$param]:-}" ]; then
             cmd+=" --$param ${values[$param]}"
