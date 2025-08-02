@@ -1,37 +1,32 @@
 #!/usr/bin/env bash
 
-SCRIPT_DIR="$(dirname "$(realpath "$0")")"
+# INSTALL_DIR is set in environment.
 
-source $SCRIPT_DIR/lib/system_utils.sh
-
-
-declare -A commands=(
-    [download_databases]="Install Databases (Kneaddata, Metaphlan, Humann)"
-    [qc_dna]="Quality Control for DNA"
-    [qc_rna]="Quality Control for RNA"
-    [microbial_profiles]="Get microbial profiles with Metaphlan and Humann"
-    [gene_call]="Assemble contigs and predict genes with Megahit and Prodigal"
-)
-
+# Load platform-specific utilities (Linux/macOS)
+source "$INSTALL_DIR/utilities/lib/system_utils.sh"
+source "$INSTALL_DIR/utilities/lib/workflow_definitions.sh"
 
 # Usage message
 function usage() {
     echo ""
     echo "Usage: metagear <command> [options]"
     echo "Commands:"
-    for cmd in "${!commands[@]}"; do
-        printf "  %-20s %s\n" "$cmd" "${commands[$cmd]}."
-    done
+    get_workflow_list
     echo ""
     exit 1
 }
 
 
 function check_command {
-    # Check if the command exists in the commands array
-    if ! [[ -v commands[$1] ]]; then
-        echo "Error: Command '$1' not found."
-        usage
+    # Check if the command exists in the JSON workflow definitions
+    if [ -f "$INSTALL_DIR/utilities/lib/workflow_definitions.json" ]; then
+        if ! workflow_exists "$1"; then
+            echo "Error: Command '$1' not found."
+            usage
+            exit 1
+        fi
+    else
+        echo "Error: workflow definitions file not found." >&2
         exit 1
     fi
 }
@@ -73,8 +68,8 @@ check_requirements() {
 
 function check_metagear_home() {
 
-    user_config_file=$METAGEAR_DIR/metagear.config
-    user_env_file=$METAGEAR_DIR/metagear.env
+    user_config_file=$INSTALL_DIR/metagear.config
+    user_env_file=$INSTALL_DIR/metagear.env
 
     if [ ! -f $user_config_file ]; then
 
@@ -88,7 +83,18 @@ function check_metagear_home() {
         total_memory_gb=$(get_total_memory_gb)
         echo "Installed RAM: ${total_memory_gb} GB"
 
-        cp $METAGEAR_DIR/utilities/templates/metagear.config $user_config_file
+        if (( total_cpu_count < 48 )) && (( $(printf '%.0f' "$total_memory_gb") < 80 )); then
+            default_cpu_count=$(( total_cpu_count * 80 / 100 ))
+            if (( default_cpu_count < 1 )); then
+                default_cpu_count=1
+            fi
+            default_memory_gb=$(awk -v mem="$total_memory_gb" 'BEGIN{printf "%.0f", mem*0.8}')
+        else
+            default_cpu_count=48
+            default_memory_gb=80
+        fi
+
+        cp $INSTALL_DIR/utilities/templates/metagear.config $user_config_file
 
         # detect macOS vs Linux so we can pass the right -i flag
         if [[ "$(uname)" == "Darwin" ]]; then
@@ -103,34 +109,45 @@ function check_metagear_home() {
 
         # 1) Update max_memory
         sed "${SED_INPLACE[@]}" \
-            "s/^max_memory = '[0-9]\+\(\.[0-9]\+\)\?GB'/max_memory = '${total_memory_gb}GB'/" \
+            "s/^max_memory = '[0-9]\+\(\.[0-9]\+\)\?GB'/max_memory = '${default_memory_gb}GB'/" \
             "$user_config_file"
 
         # 2) Update max_cpus
         sed "${SED_INPLACE[@]}" \
-            "s/^max_cpus = [0-9]\+/max_cpus = ${total_cpu_count}/" \
+            "s/^max_cpus = [0-9]\+/max_cpus = ${default_cpu_count}/" \
             "$user_config_file"
 
         # 3) Update databases_root (using | as delimiter so we don’t have to escape /)
         sed "${SED_INPLACE[@]}" \
-            "s|^databases_root = \".*\"|databases_root = \"${HOME}/.metagear/databases\"|" \
+            "s|^databases_root = \".*\"|databases_root = \"${INSTALL_DIR}/databases\"|" \
             "$user_config_file"
 
-        cp $METAGEAR_DIR/utilities/templates/metagear.env $user_env_file
+        # export INSTALL_DIR=$INSTALL_DIR
+        # cp $INSTALL_DIR/utilities/templates/metagear.env $user_env_file
+        envsubst < $INSTALL_DIR/utilities/templates/metagear.env > $user_env_file
+
+        GREEN=$(tput setaf 2)
+        YELLOW=$(tput setaf 3)
+        BOLD=$(tput bold)
+        RESET=$(tput sgr0)
+
+        GREEN=$(tput setaf 2)
+        YELLOW=$(tput setaf 3)
+        BOLD=$(tput bold)
+        RESET=$(tput sgr0)
 
         echo ""
-        echo "It seems this is the first time MetaGEAR runs in this system..."
+        echo "${GREEN}It seems this is the first time MetaGEAR runs in this system...${RESET}"
         echo ""
         check_requirements
         echo ""
-        echo "   - User configuration was created in ~/.metagear/metagear.config"
-        echo "   - Environment file was created in ~/.metagear/metagear.env"
+        echo "   - User configuration was created in $INSTALL_DIR/metagear.config"
+        echo "   - Environment file was created in $INSTALL_DIR/metagear.env"
         echo ""
-        echo "IMPORTANT: Please review these file before re-launching the MetaGEAR pipeline."
+        echo "${BOLD}${YELLOW}IMPORTANT: Review these files before re-launching the MetaGEAR pipeline.${RESET}"
         echo ""
 
         exit 0
-
     fi
 
 }

@@ -1,2 +1,6 @@
 .metagear
 metagear
+metagear.config
+metagear.env
+metagear_qc_dna.sh
+qc_dna.config
