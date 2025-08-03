@@ -3,7 +3,6 @@ description: MetaGEAR - High-throughput microbiome metagenomic analysis platform
 
 # GitHub Pages settings
 plugins:
-  - jekyll-readme-index
   - jekyll-optional-front-matter
   - jekyll-default-layout
   - jekyll-titles-from-headings
