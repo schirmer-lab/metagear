@@ -20,11 +20,7 @@
     # 4) Check that metagear wrapper is created in current directory
     [ -f metagear ]
 
-    # 5) Run metagear wrapper once to trigger config file creation (metagear.config is created when main.sh is first run)
-    export INSTALL_DIR="$temp_dir"
-    run "./metagear" --help
-
-    # 6) Check that metagear.config, and metagear.env exists in the installation directory
+    # 5) Check that metagear.config, and metagear.env exists in the installation directory
     [ -f "$temp_dir/metagear.config" ]
     [ -f "$temp_dir/metagear.env" ]
     

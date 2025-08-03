@@ -4,7 +4,8 @@
       "global_parameters": [
         { "name": "outdir", "required": false, "default": "results", "description": "Output directory" },
         { "name": "help", "required": false,  "description": "Display help information" },
-        { "name": "debug", "required": false, "default": false, "description": "Enable debug mode" }
+        { "name": "debug", "required": false, "default": false, "description": "Enable debug mode" },
+        { "name": "config", "required": false, "description": "Custom configuration file" }
       ],
       "definitions": [
         {

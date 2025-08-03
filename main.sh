@@ -30,7 +30,22 @@ fi
 COMMAND="$1"
 shift
 
+# Handle global --help flag
+if [ "$COMMAND" = "--help" ] || [ "$COMMAND" = "-help" ] || [ "$COMMAND" = "help" ]; then
+    usage
+fi
+
 check_command "$COMMAND"
+
+# Check for help flag early, before any file operations
+for arg in "$@"; do
+    if [ "$arg" = "--help" ] || [ "$arg" = "-help" ]; then
+        # Load workflow functions to show help
+        source "${UTILITIES_DIR}/lib/workflow_definitions.sh"
+        show_workflow_help "$COMMAND"
+        exit 0
+    fi
+done
 
 # Detect preview mode and filter it from the arguments
 PREVIEW=false

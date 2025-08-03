@@ -116,12 +116,13 @@ teardown() {
 
     # Should return 3 global parameters
     param_count=$(echo "$output" | wc -l)
-    [ "$param_count" -eq 3 ]
+    [ "$param_count" -eq 4 ]
 
     # Check for expected global parameters (adjust for compact JSON from jq)
     [[ "$output" =~ "\"name\":\"outdir\"" ]]
     [[ "$output" =~ "\"name\":\"help\"" ]]
     [[ "$output" =~ "\"name\":\"debug\"" ]]
+    [[ "$output" =~ "\"name\":\"config\"" ]]
     [[ "$output" =~ "\"default\":\"results\"" ]]
     [[ "$output" =~ "\"default\":false" ]]
 }

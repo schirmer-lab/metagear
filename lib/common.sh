@@ -66,91 +66,29 @@ check_requirements() {
 }
 
 
+
 function check_metagear_home() {
 
     user_config_file=$INSTALL_DIR/metagear.config
     user_env_file=$INSTALL_DIR/metagear.env
 
-    if [ ! -f $user_config_file ]; then
+    # Check if configuration files exist
+    if [ ! -f "$user_config_file" ]; then
+        echo "Error: Configuration file not found at $user_config_file" >&2
+        echo "This suggests MetaGEAR was not properly installed." >&2
+        echo "Please run the installation script again." >&2
+        exit 1
+    fi
 
-        echo "-----------------"
-        echo "System resources:"
-        echo "-----------------"
-
-        total_cpu_count=$(get_cpu_count)
-        echo "CPU Count: ${total_cpu_count}"
-
-        total_memory_gb=$(get_total_memory_gb)
-        echo "Installed RAM: ${total_memory_gb} GB"
-
-        if (( total_cpu_count < 48 )) && (( $(printf '%.0f' "$total_memory_gb") < 80 )); then
-            default_cpu_count=$(( total_cpu_count * 80 / 100 ))
-            if (( default_cpu_count < 1 )); then
-                default_cpu_count=1
-            fi
-            default_memory_gb=$(awk -v mem="$total_memory_gb" 'BEGIN{printf "%.0f", mem*0.8}')
-        else
-            default_cpu_count=48
-            default_memory_gb=80
-        fi
-
-        cp $INSTALL_DIR/utilities/templates/metagear.config $user_config_file
-
-        # detect macOS vs Linux so we can pass the right -i flag
-        if [[ "$(uname)" == "Darwin" ]]; then
-        # macOS sed: -i requires a backup‐suffix, so we give it an empty one
-        SED_INPLACE=(-i '')
-        else
-        # GNU sed: -i works with no suffix
-        SED_INPLACE=(-i)
-        fi
-
-        # now the three edits, using a more precise regex for CPUs and escaping properly:
-
-        # 1) Update max_memory
-        sed "${SED_INPLACE[@]}" \
-            "s/^max_memory = '[0-9]\+\(\.[0-9]\+\)\?GB'/max_memory = '${default_memory_gb}GB'/" \
-            "$user_config_file"
-
-        # 2) Update max_cpus
-        sed "${SED_INPLACE[@]}" \
-            "s/^max_cpus = [0-9]\+/max_cpus = ${default_cpu_count}/" \
-            "$user_config_file"
-
-        # 3) Update databases_root (using | as delimiter so we don’t have to escape /)
-        sed "${SED_INPLACE[@]}" \
-            "s|^databases_root = \".*\"|databases_root = \"${INSTALL_DIR}/databases\"|" \
-            "$user_config_file"
-
-        # export INSTALL_DIR=$INSTALL_DIR
-        # cp $INSTALL_DIR/utilities/templates/metagear.env $user_env_file
-        envsubst < $INSTALL_DIR/utilities/templates/metagear.env > $user_env_file
-
-        GREEN=$(tput setaf 2)
-        YELLOW=$(tput setaf 3)
-        BOLD=$(tput bold)
-        RESET=$(tput sgr0)
-
-        GREEN=$(tput setaf 2)
-        YELLOW=$(tput setaf 3)
-        BOLD=$(tput bold)
-        RESET=$(tput sgr0)
-
-        echo ""
-        echo "${GREEN}It seems this is the first time MetaGEAR runs in this system...${RESET}"
-        echo ""
-        check_requirements
-        echo ""
-        echo "   - User configuration was created in $INSTALL_DIR/metagear.config"
-        echo "   - Environment file was created in $INSTALL_DIR/metagear.env"
-        echo ""
-        echo "${BOLD}${YELLOW}IMPORTANT: Review these files before re-launching the MetaGEAR pipeline.${RESET}"
-        echo ""
-
-        exit 0
+    if [ ! -f "$user_env_file" ]; then
+        echo "Error: Environment file not found at $user_env_file" >&2
+        echo "This suggests MetaGEAR was not properly installed." >&2
+        echo "Please run the installation script again." >&2
+        exit 1
     fi
 
 }
+
 
 
 detect_container_tool() {

@@ -3,7 +3,13 @@
 
 # Get the directory where this script is located
 SCRIPT_DIR="$(dirname "$(realpath "${BASH_SOURCE[0]}")")"
-JSON_DEFINITIONS_FILE="$SCRIPT_DIR/workflow_definitions.json"
+
+# Set JSON_DEFINITIONS_FILE prioritizing pipeline-specific definitions
+if [ -f "$INSTALL_DIR/latest/workflow_definitions.json" ]; then
+    JSON_DEFINITIONS_FILE="$INSTALL_DIR/latest/workflow_definitions.json"
+else
+    JSON_DEFINITIONS_FILE="$SCRIPT_DIR/workflow_definitions.json"
+fi
 
 # Factory-style loader for JSON parser implementations
 # Load appropriate JSON parser based on availability (jq takes priority)
@@ -142,4 +148,73 @@ get_workflow_list() {
         echo "Error: workflow definitions file not found at $JSON_DEFINITIONS_FILE" >&2
         return 1
     fi
+}
+
+# Function to display workflow-specific help
+show_workflow_help() {
+    local workflow_name="$1"
+    
+    if ! workflow_exists "$workflow_name"; then
+        echo "Error: Workflow '$workflow_name' not found." >&2
+        return 1
+    fi
+    
+    local desc
+    desc=$(get_workflow_description "$workflow_name")
+    
+    echo ""
+    echo "Usage: metagear $workflow_name [options]"
+    echo "Description: $desc"
+    echo ""
+    
+    # Get workflow-specific parameters
+    local has_workflow_params=false
+    while IFS= read -r param_json; do
+        [ -z "$param_json" ] && continue
+        if [ "$has_workflow_params" = false ]; then
+            echo "Workflow-specific parameters:"
+            has_workflow_params=true
+        fi
+        local name required default description
+        name=$(get_parameter_field "$param_json" "name")
+        required=$(get_parameter_field "$param_json" "required")
+        default=$(get_parameter_field "$param_json" "default")
+        description=$(get_parameter_field "$param_json" "description")
+        
+        [ -n "$name" ] || continue
+        
+        local req_text=""
+        [ "$required" = "true" ] && req_text=" (required)"
+        
+        local default_text=""
+        [ -n "$default" ] && [ "$default" != "null" ] && default_text=" [default: $default]"
+        
+        printf "  --%-18s %s%s%s\n" "$name" "$description" "$req_text" "$default_text"
+    done < <(get_workflow_parameters "$workflow_name")
+    
+    # Add separator if we had workflow-specific parameters
+    [ "$has_workflow_params" = true ] && echo ""
+    
+    # Get global parameters
+    echo "Global parameters:"
+    while IFS= read -r param_json; do
+        [ -z "$param_json" ] && continue
+        local name required default description
+        name=$(get_parameter_field "$param_json" "name")
+        required=$(get_parameter_field "$param_json" "required")
+        default=$(get_parameter_field "$param_json" "default")
+        description=$(get_parameter_field "$param_json" "description")
+        
+        [ -n "$name" ] || continue
+        
+        local req_text=""
+        [ "$required" = "true" ] && req_text=" (required)"
+        
+        local default_text=""
+        [ -n "$default" ] && [ "$default" != "null" ] && default_text=" [default: $default]"
+        
+        printf "  --%-18s %s%s%s\n" "$name" "$description" "$req_text" "$default_text"
+    done < <(get_global_parameters)
+    
+    echo ""
 }

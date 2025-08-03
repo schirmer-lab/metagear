@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Color codes for terminal output
+YELLOW=$(tput setaf 3)
+GREEN=$(tput setaf 2)
+RESET=$(tput sgr0)
 
 # 1) Config
 INSTALL_DIR="${HOME}/.metagear"
@@ -67,9 +71,8 @@ echo "This script will install MetaGEAR v${PIPELINE_VERSION} and its utilities."
 echo ""
 
 # 3) Install utilities
-echo "→ Setting Up MetaGEAR utilities"
+echo "${GREEN}→ Setting Up MetaGEAR utilities${RESET}"
 
-# echo "→ Cleaning old Utilities directory"
 rm -rf "${INSTALL_DIR}/utilities"
 
 if [[ -n "${CUSTOM_UTILS_PATH}" ]]; then # If utilities path is provided, we use it directly
@@ -83,7 +86,7 @@ else # Otherwise, download the default utilities
   UTILS_EXTRACTED_DIR="${INSTALL_DIR}/downloads/utilities"
 
   wget -qO "${UTILS_TMP_ZIP}" "${UTILS_ZIP_URL}"
-  echo "→ Extracting to ${UTILS_EXTRACTED_DIR}"
+  echo "  Extracting to ${UTILS_EXTRACTED_DIR}"
   unzip -qo "${UTILS_TMP_ZIP}" -d "${UTILS_EXTRACTED_DIR}"
 
   mv ${UTILS_EXTRACTED_DIR}/metagear-main ${INSTALL_DIR}/utilities
@@ -92,7 +95,7 @@ fi
 
 # 4) Install the Pipeline
 echo ""
-echo "→ Installing MetaGEAR"
+echo "${GREEN}→ Installing MetaGEAR${RESET}"
 
 rm -rf "${INSTALL_DIR}/latest"
 
@@ -101,7 +104,7 @@ if [[ -n "${CUSTOM_PIPELINE_PATH}" ]]; then # If pipeline path is provided, we u
   ln -s "${CUSTOM_PIPELINE_PATH}" "${INSTALL_DIR}/latest"
   
 else # Otherwise, download the default pipeline
-  echo "→ Installing v${PIPELINE_VERSION} from GitHub"
+  echo "  Installing v${PIPELINE_VERSION} from GitHub"
 
   EXTRACTED_DIR="${INSTALL_DIR}/downloads/v${PIPELINE_VERSION}"
   PIPELINE_DIR="${INSTALL_DIR}/v${PIPELINE_VERSION}"
@@ -113,7 +116,7 @@ else # Otherwise, download the default pipeline
 
   wget -qO "${TMP_ZIP}" "${ZIP_URL}"
 
-  echo "→ Extracting to ${EXTRACTED_DIR}"
+  echo "  Extracting to ${EXTRACTED_DIR}"
   unzip -qo "${TMP_ZIP}" -d "${EXTRACTED_DIR}"
   mv ${EXTRACTED_DIR}/${PIPELINE_REPOSITORY}-${PIPELINE_VERSION} ${PIPELINE_DIR}
 
@@ -130,22 +133,89 @@ exec "\${INSTALL_DIR}/utilities/${SCRIPT}" "\$@"
 EOF
 chmod +x "${WRAPPER_PATH}"
 
-# 6) Remove temporary files
+# 6) Create configuration files
 echo ""
-echo "→ Cleaning up"
+echo "${GREEN}→ Creating configuration files${RESET}"
+
+# Load system utilities to get system information
+source "${INSTALL_DIR}/utilities/lib/system_utils.sh"
+
+user_config_file="${INSTALL_DIR}/metagear.config"
+user_env_file="${INSTALL_DIR}/metagear.env"
+
+total_cpu_count=$(get_cpu_count)
+total_memory_gb=$(get_total_memory_gb)
+
+echo "  - Found ${total_cpu_count} CPUs and ${total_memory_gb} GB of Memory in the system."
+
+if (( total_cpu_count < 48 )) && (( $(printf '%.0f' "$total_memory_gb") < 80 )); then
+    default_cpu_count=$(( total_cpu_count * 80 / 100 ))
+    if (( default_cpu_count < 1 )); then
+        default_cpu_count=1
+    fi
+    default_memory_gb=$(awk -v mem="$total_memory_gb" 'BEGIN{printf "%.0f", mem*0.8}')
+else
+    default_cpu_count=48
+    default_memory_gb=80
+fi
+
+echo "  - MetaGEAR will use ${default_cpu_count} CPUs and ${default_memory_gb} GB of Memory."
+
+# Export variables for envsubst
+export INSTALL_DIR="${INSTALL_DIR}"
+export MAX_CPUS="${default_cpu_count}"
+export MAX_MEMORY="${default_memory_gb}"
+
+# Create configuration file with environment variable substitution
+envsubst < "${INSTALL_DIR}/utilities/templates/metagear.config" > "$user_config_file"
+
+# Create environment file with INSTALL_DIR substitution
+envsubst < "${INSTALL_DIR}/utilities/templates/metagear.env" > "$user_env_file"
+
+echo "  - User configuration created: ${INSTALL_DIR}/metagear.config"
+echo "  - Environment file created: ${INSTALL_DIR}/metagear.env"
+
+# Check dependencies and provide informational warnings
+echo ""
+echo "${GREEN}→ Checking runtime dependencies${RESET}"
+
+dep_missing=false
+
+# Check Bash version 4+
+if [ "${BASH_VERSINFO[0]}" -lt 4 ]; then
+    echo "  ⚠ WARNING: Bash version 4 or higher is required (found version ${BASH_VERSINFO[0]})" >&2
+    dep_missing=true
+fi
+
+# Check for nextflow
+if ! command -v nextflow >/dev/null 2>&1; then
+    echo "  ⚠ WARNING: Nextflow is not installed"
+    dep_missing=true
+fi
+
+# Check for container engines
+if ! command -v singularity >/dev/null 2>&1 && ! command -v docker >/dev/null 2>&1; then
+    echo "  ⚠ WARNING: Neither Singularity nor Docker is installed (one is required)"
+    dep_missing=true
+fi
+
+if [ "$dep_missing" = false ]; then
+    echo "  ✓ All runtime dependencies are available"
+fi
+
+# 7) Remove temporary files
 rm -rf "${INSTALL_DIR}/downloads"
 
 
-# 7) Done
+# 8) Done
 echo
-echo "✔ Installed MetaGEAR Pipeline"
+echo "${GREEN}✔ Installed MetaGEAR Pipeline${RESET}"
 echo "  • Installation directory: ${INSTALL_DIR}"
 echo "    - Pipeline"
 echo "    - Utilities"
+echo "    - Configuration files"
 echo ""
-YELLOW=$(tput setaf 3)
-RESET=$(tput sgr0)
 echo "${YELLOW}Next steps:${RESET}"
-echo "  • Move '${WRAPPER_PATH}' into a directory in your PATH (e.g. /usr/local/bin)"
-echo "  • Run './${WRAPPER_NAME}' once to create default configuration files"
-echo "  • Review ${INSTALL_DIR}/metagear.config before running pipelines"
+echo "  • Add '${WRAPPER_PATH}' to your \$PATH (e.g. copy/move to /usr/local/bin)"
+echo "  • Review ${INSTALL_DIR}/metagear.config and adjust as needed"
+echo "  • Run './${WRAPPER_NAME}' (or just 'metagear' when it's already in your \$PATH) to start using MetaGEAR"
