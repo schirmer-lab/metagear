@@ -20,8 +20,8 @@ MetaGEAR is an umbrella platform for high-throughput microbiome metagenomic anal
 
 ### Prerequisites
 
-- [Java 11+](https://ubuntu.com/tutorials/install-jre#2-installing-openjdk-jre)
-- [Nextflow 22+](https://www.nextflow.io/docs/latest/install.html#install-page)
+- [Java 17+](https://ubuntu.com/tutorials/install-jre#2-installing-openjdk-jre)
+- [Nextflow 25+](https://www.nextflow.io/docs/latest/install.html#install-page)
 - [Docker](https://docs.docker.com/engine/install/ubuntu/#install-using-the-repository) or [Singularity](https://docs.sylabs.io/guides/3.0/user-guide/installation.html#install-the-debian-ubuntu-package-using-apt)
 
 ### Installation
@@ -31,6 +31,8 @@ To install the Pipeline, just run:
 ```bash
 curl -L http://get-metagear.schirmerlab.de | bash
 ```
+
+After installing, execute `./metagear` once to generate default configuration files in `~/.metagear`. The installer sets resource limits to roughly 80% of your available CPUs and RAM (capped at 48 CPUs and 80 GB). Review `~/.metagear/metagear.config` before running any workflow.
 
 ### Usage
 
@@ -43,7 +45,22 @@ To run the QC and Microbial Profiles workflows, run:
 ```bash
 metagear qc_dna --input samples.csv
 metagear microbial_profiles --input samples.csv
+metagear qc_dna --input samples.csv -preview   # generate script only
 ```
+The output directory defaults to `./results` when `--outdir` is not specified.
+
+#### Preview mode: 
+
+Running with `-preview` prints the generated script instead of executing it.
+For instance when running 
+```bash
+metagear qc_dna --input samples.csv -preview
+```
+A file `metagear_qc_dna.sh` is generated in the current directory and can
+be executed manually, or the command can be re-run without `-preview` to directly run the pipeline.
+
+### Input format
+
 
 The input file should look like this:
 ```
