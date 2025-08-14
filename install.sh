@@ -78,7 +78,7 @@ rm -rf "${INSTALL_DIR}/utilities"
 if [[ -n "${CUSTOM_UTILS_PATH}" ]]; then # If utilities path is provided, we use it directly
   echo "  Using custom utilities directoy: ${CUSTOM_UTILS_PATH}"
   ln -s "${CUSTOM_UTILS_PATH}" "${INSTALL_DIR}/utilities"
-  
+
 else # Otherwise, download the default utilities
   echo "  Downloading MetaGEAR utilities from default repository..."
   UTILS_ZIP_URL="https://github.com/${ORGANIZATION}/${UTILS_REPOSITORY}/archive/refs/heads/main.zip"
@@ -102,7 +102,7 @@ rm -rf "${INSTALL_DIR}/latest"
 if [[ -n "${CUSTOM_PIPELINE_PATH}" ]]; then # If pipeline path is provided, we use it directly
   echo "  Using custom pipeline directory: ${CUSTOM_PIPELINE_PATH}"
   ln -s "${CUSTOM_PIPELINE_PATH}" "${INSTALL_DIR}/latest"
-  
+
 else # Otherwise, download the default pipeline
   echo "  Installing v${PIPELINE_VERSION} from GitHub"
 
@@ -167,13 +167,20 @@ export MAX_CPUS="${default_cpu_count}"
 export MAX_MEMORY="${default_memory_gb}"
 
 # Create configuration file with environment variable substitution
-envsubst < "${INSTALL_DIR}/utilities/templates/metagear.config" > "$user_config_file"
+if [[ -f "$user_config_file" ]]; then
+    echo "  - Configuration file already exists, skipping: ${INSTALL_DIR}/metagear.config"
+else
+    envsubst < "${INSTALL_DIR}/utilities/templates/metagear.config" > "$user_config_file"
+    echo "  - User configuration created: ${INSTALL_DIR}/metagear.config"
+fi
 
 # Create environment file with INSTALL_DIR substitution
-envsubst < "${INSTALL_DIR}/utilities/templates/metagear.env" > "$user_env_file"
-
-echo "  - User configuration created: ${INSTALL_DIR}/metagear.config"
-echo "  - Environment file created: ${INSTALL_DIR}/metagear.env"
+if [[ -f "$user_env_file" ]]; then
+    echo "  - Environment file already exists, skipping: ${INSTALL_DIR}/metagear.env"
+else
+    envsubst < "${INSTALL_DIR}/utilities/templates/metagear.env" > "$user_env_file"
+    echo "  - Environment file created: ${INSTALL_DIR}/metagear.env"
+fi
 
 # Check dependencies and provide informational warnings
 echo ""
