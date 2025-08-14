@@ -49,7 +49,7 @@ echo "Headers should use # style (not underline style):"
 find "$REPO_ROOT/docs" -name "*.md" -exec grep -Hn "^===\|^---" {} \;
 
 # Check for consistent code block formatting
-echo "Code blocks should use ``` (not indentation):"
+echo "Code blocks should use "\`\`\`" (not indentation):"
 find "$REPO_ROOT/docs" -name "*.md" -exec grep -Hn "^    [a-zA-Z]" {} \;
 
 # Generate documentation index
