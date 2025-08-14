@@ -44,7 +44,7 @@ The `install.sh` script accepts the following optional parameters:
 
 - `--install-dir <path>` – Specify a custom installation directory (default: `~/.metagear`)
 - `--pipeline <path>` – Use a local pipeline directory for development instead of downloading from GitHub
-- `--utilities <path>` – Use a custom utilities repository path instead of the default repository
+- `--utilities <path>` – Use a custom wrapper repository path instead of the default repository
 
 ### Examples
 
@@ -56,7 +56,7 @@ The `install.sh` script accepts the following optional parameters:
 ./install.sh --pipeline /home/user/metagear-pipeline
 
 # Use custom utilities and pipeline paths
-./install.sh --utilities /home/user/custom-utils --pipeline /home/user/custom-pipeline
+./install.sh --utilities /home/user/metagear --pipeline /home/user/custom-pipeline
 
 # Combine custom installation directory with local development
 ./install.sh --install-dir /tmp/metagear-test --pipeline /home/user/metagear-pipeline

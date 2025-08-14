@@ -62,6 +62,19 @@ while (( $# > 0 )); do
     shift
 done
 
+# If no arguments remain after filtering out --preview, check if help should be shown
+if [ ${#REMAINING_ARGS[@]} -eq 0 ]; then
+    # Load workflow functions to check if workflow has required parameters
+    source "${UTILITIES_DIR}/lib/workflow_definitions.sh"
+
+    # Only show help if the workflow has required parameters
+    if workflow_has_required_parameters "$COMMAND"; then
+        show_workflow_help "$COMMAND"
+        exit 0
+    fi
+    # If no required parameters, continue with execution (empty REMAINING_ARGS is fine)
+fi
+
 # mkdir -p $LAUNCH_DIR/.metagear
 
 custom_config_files=( $PIPELINE_DIR/conf/metagear/$COMMAND.config $INSTALL_DIR/metagear.config )
