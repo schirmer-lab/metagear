@@ -1,6 +1,30 @@
-.metagear
+# Runtime/build artifacts
+.metagear/
 metagear
 metagear.config
 metagear.env
-metagear_qc_dna.sh
-qc_dna.config
+metagear_*.sh
+*.config
+.nextflow*
+results/
+.venv/
+
+# Jekyll build files
+docs/_site/
+docs/.jekyll-cache/
+docs/.jekyll-metadata
+docs/.sass-cache/
+
+# Ruby/Bundler files
+docs/Gemfile.lock
+docs/.bundle/
+docs/vendor/
+
+# macOS files
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db

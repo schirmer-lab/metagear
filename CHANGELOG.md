@@ -10,6 +10,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Added
 
 ### Changed
+- Now using MetaGEAR Pipeline v1.0 (previously v.0.1.1)
 
 ### Deprecated
 
@@ -36,6 +37,7 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Comprehensive documentation and usage examples
 
 ### Changed
+- Refactored JSON parser to use factory pattern for better maintainability
 - Refactored workflow definitions for better maintainability
 - Updated Jekyll configuration for documentation
 
