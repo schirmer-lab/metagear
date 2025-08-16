@@ -1,0 +1,18 @@
+# Development configuration for local testing
+# Use this with: bundle exec jekyll serve --config _config.yml,_config_dev.yml
+
+# Override baseurl for local development
+baseurl: ""
+url: "http://localhost:4000"
+
+# Show drafts and future posts in development
+show_drafts: true
+future: true
+
+# Incremental build for faster development
+incremental: true
+
+# Additional development plugins
+plugins:
+  - jekyll-feed
+  - jekyll-sitemap

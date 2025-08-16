@@ -84,7 +84,7 @@ teardown() {
     [[ "$output" =~ "Usage: metagear gene_analysis" ]]
     [[ "$output" =~ "Gene centric analysis workflow" ]]
     [[ "$output" =~ "--input" ]]
-    [[ "$output" =~ "--catalog" ]]
+    [[ "$output" =~ "--contig_catalog" ]]
     [[ "$output" =~ "Contigs catalog" ]]
 
     # Check that no pipeline files were created
@@ -226,7 +226,7 @@ teardown() {
     [[ "$output" =~ "Usage: metagear gene_analysis" ]]
     [[ "$output" =~ "Gene centric analysis workflow" ]]
     [[ "$output" =~ "--input" ]]
-    [[ "$output" =~ "--catalog" ]]
+    [[ "$output" =~ "--contig_catalog" ]]
     [[ "$output" =~ "Contigs catalog" ]]
 
     # Check that no pipeline files were created

@@ -1,0 +1,46 @@
+title: MetaGEAR
+description: Comprehensive metagenomic analysis pipeline
+baseurl: "/metagear"
+url: "https://schirmer-lab.github.io"
+
+# Build settings
+markdown: kramdown
+highlighter: rouge
+
+# Theme (GitHub Pages compatible)
+remote_theme: just-the-docs/just-the-docs
+
+# Collections
+collections:
+  quickstart:
+    output: true
+    permalink: /quick-start/:path/
+  workflows:
+    output: true
+    permalink: /workflows/:path/
+  developers:
+    output: true
+    permalink: /developers/:path/
+
+# Just the Docs configuration
+just_the_docs:
+  collections:
+    quickstart:
+    workflows:
+    developers:
+  nav_sort: case_insensitive
+
+# Plugins (safe for GitHub Pages when built via Actions)
+plugins:
+  - jekyll-seo-tag
+  - jekyll-sitemap
+  - jekyll-remote-theme
+  - jekyll-redirect-from
+
+# Exclude from processing
+exclude:
+  - README.md
+  - Gemfile
+  - Gemfile.lock
+  - node_modules
+  - vendor

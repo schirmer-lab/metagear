@@ -1,4 +1,13 @@
+---
+layout: default
+title: Troubleshooting Guide
+nav_order: 5
+nav_exclude: true
+permalink: /troubleshooting/
+---
+
 # Troubleshooting Guide
+{: .no_toc }
 
 Common issues and solutions for the MetaGEAR Pipeline Wrapper.
 

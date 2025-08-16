@@ -10,7 +10,7 @@ RESET=$(tput sgr0)
 INSTALL_DIR="${HOME}/.metagear"
 ORGANIZATION="schirmer-lab"
 PIPELINE_REPOSITORY="metagear-pipeline"
-PIPELINE_VERSION=0.1.1
+PIPELINE_VERSION=1.0
 UTILS_REPOSITORY="metagear"
 SCRIPT="main.sh"
 

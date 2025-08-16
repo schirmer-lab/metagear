@@ -97,11 +97,12 @@ teardown() {
 
     # Should return two parameters (input and catalog)
     param_count=$(echo "$output" | wc -l)
-    [ "$param_count" -eq 2 ]
+    [ "$param_count" -eq 3 ]
 
     # Check for both parameters (adjust for compact JSON from jq)
     [[ "$output" =~ "\"name\":\"input\"" ]]
-    [[ "$output" =~ "\"name\":\"catalog\"" ]]
+    [[ "$output" =~ "\"name\":\"contig_catalog\"" ]]
+    [[ "$output" =~ "\"name\":\"metaphlan_profiles\"" ]]
 }
 
 @test "get_workflow_parameters returns empty for download_databases" {

@@ -47,10 +47,24 @@ if [ "$1" = "release" ]; then
     DATE=$(date +%Y-%m-%d)
 
     # Replace [Unreleased] with the version and add new [Unreleased] section
-    sed -i "s/## \[Unreleased\]/## [$VERSION] - $DATE/" "$CHANGELOG_PATH"
+    sed "s/## \[Unreleased\]/## [$VERSION] - $DATE/" "$CHANGELOG_PATH" > "$CHANGELOG_PATH.tmp" && mv "$CHANGELOG_PATH.tmp" "$CHANGELOG_PATH"
 
     # Add new unreleased section at the top
-    sed -i "/## \[$VERSION\] - $DATE/i ## [Unreleased]\n\n### Added\n\n### Changed\n\n### Deprecated\n\n### Removed\n\n### Fixed\n\n### Security\n" "$CHANGELOG_PATH"
+    sed "/## \[$VERSION\] - $DATE/i\\
+## [Unreleased]\\
+\\
+### Added\\
+\\
+### Changed\\
+\\
+### Deprecated\\
+\\
+### Removed\\
+\\
+### Fixed\\
+\\
+### Security\\
+" "$CHANGELOG_PATH" > "$CHANGELOG_PATH.tmp" && mv "$CHANGELOG_PATH.tmp" "$CHANGELOG_PATH"
 
     # Update the links at the bottom
     echo "" >> "$CHANGELOG_PATH"
@@ -98,12 +112,15 @@ esac
 # Add entry to changelog
 if [ -z "${VERSION:-}" ]; then
     # Add to unreleased section
-    sed -i "/^### $TYPE$/a - $DESCRIPTION" "$CHANGELOG_PATH"
+    sed "/^### $TYPE$/a\\
+- $DESCRIPTION
+" "$CHANGELOG_PATH" > "$CHANGELOG_PATH.tmp" && mv "$CHANGELOG_PATH.tmp" "$CHANGELOG_PATH"
     echo "Added to unreleased section: [$TYPE] $DESCRIPTION"
 else
     # Add to specific version (if it exists)
     if grep -q "## \[$VERSION\]" "$CHANGELOG_PATH"; then
-        sed -i "/^## \[$VERSION\]/,/^## \[/s/^### $TYPE$/&\n- $DESCRIPTION/" "$CHANGELOG_PATH"
+        sed "/^## \[$VERSION\]/,/^## \[/s/^### $TYPE$/&\\
+- $DESCRIPTION/" "$CHANGELOG_PATH" > "$CHANGELOG_PATH.tmp" && mv "$CHANGELOG_PATH.tmp" "$CHANGELOG_PATH"
         echo "Added to version $VERSION: [$TYPE] $DESCRIPTION"
     else
         echo "Error: Version $VERSION not found in changelog"
