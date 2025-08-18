@@ -8,6 +8,7 @@ permalink: /developers/
 ---
 
 # Developer Info
+{: .no_toc }
 
 This section contains documentation specifically for MetaGEAR Pipeline Wrapper developers and contributors.
 
@@ -30,3 +31,5 @@ This section contains documentation specifically for MetaGEAR Pipeline Wrapper d
 
 See [Contributing Guidelines]({{ site.baseurl }}/developers/contributing/) for detailed guidelines.
 
+
+[← Back to Home]({{ site.baseurl }}/){: .btn .btn-outline }

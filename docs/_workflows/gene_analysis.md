@@ -10,6 +10,9 @@ permalink: /workflows/gene_analysis/
 
 **Gene centric analysis workflow**
 
+{: .fs-6 .fw-300 }
+This advanced workflow performs comprehensive gene-centric analysis including gene prediction, functional annotation, pangenome reconstruction, and taxonomic classification.
+
 ## Description
 
 The `gene_analysis` workflow performs comprehensive gene-centric analysis of metagenomic data. This advanced workflow focuses on detailed functional annotation and analysis:
@@ -203,3 +206,5 @@ Common issues and solutions:
 - **Annotation database errors**: Ensure all databases are properly downloaded
 - **Low gene density**: May indicate poor assembly quality or unusual sample type
 - **Long runtime**: Consider using a pre-computed catalog or increasing CPU cores
+
+[← Back to Workflows Overview]({{ site.baseurl }}/workflows/){: .btn .btn-outline }

@@ -244,3 +244,5 @@ Contributors will be:
 - Acknowledged in project documentation
 
 Thank you for contributing to MetaGEAR!
+
+[← Back to Developer Info Overview]({{ site.baseurl }}/developers/){: .btn .btn-outline }

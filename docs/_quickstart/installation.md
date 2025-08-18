@@ -20,7 +20,7 @@ The installer sets resource limits to roughly 80% of your available CPUs and RAM
 ## Post-installation steps
 
 ### Choose a Runner
-The default runner is Docker. However, we higly encourance Singularity or Apptainer to be used. Please decide what runner you want to use and set the default value in `~/.metagear/metagear.config`. For example:
+The default runner is Docker. However, we highly encourage Singularity or Apptainer to be used. Please decide what runner you want to use and set the default value in `~/.metagear/metagear.config`. For example:
 
 ```
 #!/usr/bin/env bash
@@ -54,6 +54,7 @@ profiles {
 }
 ```
 
-For better resource control, a `maxForks` parameter can be adjusted for all processes. This will determine the number of parallel processes that can be executed a given time. Keep in mind that each process can request a certain number of CPUs and RAM, this is inportant to consider when dealing with oversubscription or memmory problems.
+For better resource control, a `maxForks` parameter can be adjusted for all processes. This will determine the number of parallel processes that can be executed at a given time. Keep in mind that each process can request a certain number of CPUs and RAM, this is important to consider when dealing with oversubscription or memory problems.
 
 
+[← Back to Quick start Overview]({{ site.baseurl }}/){: .btn .btn-outline }

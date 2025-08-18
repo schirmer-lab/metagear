@@ -189,3 +189,5 @@ metagear --help
 # Validate container access
 nextflow run hello -profile singularity
 ```
+
+[← Back to Quick start Overview]({{ site.baseurl }}/){: .btn .btn-outline }

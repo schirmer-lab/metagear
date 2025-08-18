@@ -10,6 +10,10 @@ permalink: /workflows/qc_dna_rna/
 
 **Quality Control for DNA and RNA Sequencing Data**
 
+{: .fs-6 .fw-300 }
+Essential preprocessing workflows for quality control, trimming, and contamination removal of DNA and RNA sequencing data.
+
+
 ## Description
 
 MetaGEAR provides two quality control workflows for different types of sequencing data:
@@ -205,3 +209,4 @@ Before running either workflow:
   - Any RNA-seq data where rRNA removal is needed
   - Functional gene expression analysis
 
+[← Back to Workflows Overview]({{ site.baseurl }}/workflows/){: .btn .btn-outline }

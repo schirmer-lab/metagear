@@ -24,11 +24,11 @@ The output directory defaults to `./results` when `--outdir` is not specified.
 ### Preview mode:
 
 Running with `-preview` prints the generated script instead of executing it.
-For instance when running
+For instance, when running
 ```bash
 metagear qc_dna --input samples.csv -preview
 ```
-A file `metagear_qc_dna.sh` is generated in the current directory and can
+The file `metagear_qc_dna.sh` is generated in the current directory and can
 be executed manually, or the command can be re-run without `-preview` to directly run the pipeline.
 
 ### Input format
@@ -41,3 +41,4 @@ SAMPLE-01,/path/to/sample1_R1.fastq.gz,/path/to/sample1_R2.fastq.gz
 SAMPLE-02,/path/to/sample2_R1.fastq.gz,/path/to/sample2_R2.fastq.gz
 ```
 
+[← Back to Quick start Overview]({{ site.baseurl }}/){: .btn .btn-outline }

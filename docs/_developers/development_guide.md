@@ -212,3 +212,5 @@ vim ~/.metagear/dev.config
 metagear workflow_name --input file.csv --config ~/.metagear/dev.config
 ```
 
+
+[← Back to Developer Info Overview]({{ site.baseurl }}/developers/){: .btn .btn-outline }

@@ -1,5 +1,11 @@
 #!/usr/bin/env bats
 
+# Test Cases:
+# 1. install.sh creates wrapper and installation files
+# 2. install.sh skips existing config files
+# 3. install.sh creates config files when they don't exist
+# 4. install.sh handles partial existing files correctly
+
 @test "install.sh creates wrapper and installation files" {
     # 0) Create and change to temporary working directory
     temp_work_dir=$(mktemp -d)

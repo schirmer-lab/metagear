@@ -7,9 +7,15 @@ has_children: true
 permalink: /workflows/
 ---
 
-# Workflows
+# Workflows Overview
+{: .fs-9 .no_toc }
 
-MetaGEAR provides several specialized workflows for metagenomic analysis. Each workflow is designed for specific analysis goals and can be used independently or in combination.
+MetaGEAR provides several specialized workflows for metagenomic analysis.
+{: .fs-6 .fw-300 }
+
+Each workflow is designed for specific analysis goals and can be used independently or in combination. Choose the workflows that match your analysis needs, or follow the recommended order for comprehensive analysis.
+
+---
 
 <!-- ## Available Workflows -->
 
@@ -84,3 +90,5 @@ SAMPLE-03,/path/to/sample3_R1.fastq.gz,/path/to/sample3_R2.fastq.gz
 | [Microbial Profiles]({{ site.baseurl }}/workflows/microbial_profiles/) | Clean reads | Taxonomic/functional | Species profiles | Medium-High |
 | [Gene Analysis]({{ site.baseurl }}/workflows/gene_analysis/) | Clean reads | Gene-centric | Gene catalogs | High |
 
+
+[← Back to Home]({{ site.baseurl }}/){: .btn .btn-outline }

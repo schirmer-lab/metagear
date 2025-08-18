@@ -1,7 +1,6 @@
 ---
 layout: default
 title: Release Guide
-parent: Developer Info
 nav_order: 4
 nav_exclude: true
 permalink: /developers/release_guide/
@@ -361,3 +360,6 @@ git tag -a v1.2.1 -m "Fixed release"
 - **Document Breaking Changes**: Clear migration instructions
 - **Update Version References**: All documentation should reflect current version
 - **Example Updates**: Verify all examples work with new version
+
+
+[← Back to Developer Info Overview]({{ site.baseurl }}/developers/){: .btn .btn-outline }

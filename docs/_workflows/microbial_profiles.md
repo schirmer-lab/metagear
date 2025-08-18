@@ -10,6 +10,10 @@ permalink: /workflows/microbial_profiles/
 
 **Get microbial profiles with MetaPhlAn and HUMAnN**
 
+{: .fs-6 .fw-300 }
+Comprehensive taxonomic and functional profiling of microbial communities using MetaPhlAn and HUMAnN.
+
+
 ## Description
 
 The `microbial_profiles` workflow performs comprehensive microbial community analysis using state-of-the-art tools. This workflow provides both taxonomic and functional profiling:
@@ -180,3 +184,5 @@ Common issues and solutions:
 - **Memory errors**: Increase available RAM or adjust configuration
 - **Low profiling rate**: May indicate poor quality input or low microbial content
 - **Missing species**: Some novel species may not be in reference databases
+
+[← Back to Workflows Overview]({{ site.baseurl }}/workflows/){: .btn .btn-outline }

@@ -10,6 +10,10 @@ permalink: /workflows/download/
 
 **Install Databases (Kneaddata, MetaPhlAn, HUMAnN)**
 
+{: .fs-6 .fw-300 }
+Essential first step to download and install required reference databases for all MetaGEAR workflows.
+
+
 ## Description
 The `download_databases` workflow downloads and installs the required databases for MetaGEAR workflows. This includes:
 
@@ -114,3 +118,5 @@ outdir/
 - **One-time setup**: This workflow only needs to be run once per MetaGEAR installation
 - **Database updates**: Databases are periodically updated; re-run to get latest versions
 - **Storage location**: Databases are stored according to configuration file settings
+
+[← Back to Workflows Overview]({{ site.baseurl }}/workflows/){: .btn .btn-outline }

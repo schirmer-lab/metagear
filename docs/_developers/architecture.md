@@ -198,3 +198,6 @@ Pipeline Execution
 - [Bash Best Practices](https://google.github.io/styleguide/shellguide.html)
 - [Container Security](https://docs.docker.com/engine/security/)
 - [HPC Integration Patterns](https://hpc.nih.gov/apps/nextflow.html)
+
+
+[← Back to Developer Info Overview]({{ site.baseurl }}/developers/){: .btn .btn-outline }
