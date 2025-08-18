@@ -2,6 +2,15 @@
 
 This is a command-line wrapper for the MetaGEAR Pipeline for high-throughput microbiome metagenomic analysis. It provides easy-to-use tools for installing, configuring, and launching the MetaGEAR Pipeline—a Nextflow/NF-Core pipeline that streamlines end-to-end microbiome metagenomic workflows from raw reads to functional annotation.
 
+## 🚀 Quick Start
+
+1. **Install**: `curl -L http://get-metagear.schirmerlab.de | bash`
+2. **Configure**: Review `~/.metagear/metagear.config` and `~/.metagear/metagear.env`
+3. **Download databases**: `metagear download_databases`
+4. **Run workflows**: `metagear qc_dna --input samples.csv`
+
+For detailed instructions, see the [Quick Start Guide](docs/_quickstart/index.md).
+
 ---
 
 ## Features
@@ -32,8 +41,8 @@ The installer sets resource limits to roughly 80% of your available CPUs and RAM
 
 ## Post-installation steps (Important)
 
-### Choose a Runner
-The default runner is Docker. However, we higly encourance Singularity or Apptainer to be used. Please decide what runner you want to use and set the default value in `~/.metagear/metagear.config`. For example:
+### Runner Selection
+The default runner is Docker. However, we highly encourage Singularity or Apptainer to be used. Please decide what runner you want to use and set the default value in `~/.metagear/metagear.config`. For example:
 
 ```
 #!/usr/bin/env bash
@@ -45,7 +54,7 @@ RUN_PROFILES="-profile singularity,singularity_custom"
 NF_WORK="./nf_work"
 ```
 
-### Add filesystems and non-standard mount points
+### Filesystem Configuration
 By default, filesystems like `/nfs`, `/lustre`, or other non-standard mount points are usually not mounted automatically. Please make sure you include them in `~/.metagear/metagear.config` before running any workflow. For example:
 
 ```
@@ -67,7 +76,7 @@ profiles {
 }
 ```
 
-For better resource control, a `maxForks` parameter can be adjusted for all processes. This will determine the number of parallel processes that can be executed a given time. Keep in mind that each process can request a certain number of CPUs and RAM, this is inportant to consider when dealing with oversubscription or memmory problems.
+For better resource control, a `maxForks` parameter can be adjusted for all processes. This will determine the number of parallel processes that can be executed at a given time. Keep in mind that each process can request a certain number of CPUs and RAM, this is important to consider when dealing with oversubscription or memory problems.
 
 ## Usage
 
@@ -76,22 +85,21 @@ MetaGEAR requires 3 databases: Kneaddata, MetaPhlAn, HUMAnN. These can be downlo
 metagear download_databases
 ```
 
-To run the QC and Microbial Profiles workflows, run:
+To run the QC and Microbial Profiles workflows (output directory defaults to `./results` when `--outdir` is not specified):
 ```bash
 metagear qc_dna --input samples.csv
 metagear microbial_profiles --input samples.csv
 metagear qc_dna --input samples.csv -preview   # generate script only
 ```
-The output directory defaults to `./results` when `--outdir` is not specified.
 
 ### Preview mode:
 
 Running with `-preview` prints the generated script instead of executing it.
-For instance when running
+For instance, when running
 ```bash
 metagear qc_dna --input samples.csv -preview
 ```
-A file `metagear_qc_dna.sh` is generated in the current directory and can
+The file `metagear_qc_dna.sh` is generated in the current directory and can
 be executed manually, or the command can be re-run without `-preview` to directly run the pipeline.
 
 ### Input format
@@ -104,15 +112,17 @@ SAMPLE-01,/path/to/sample1_R1.fastq.gz,/path/to/sample1_R2.fastq.gz
 SAMPLE-02,/path/to/sample2_R1.fastq.gz,/path/to/sample2_R2.fastq.gz
 ```
 
+---
+
 ## 📖 Documentation
 
-- **[Configuration Guide](docs/CONFIGURATION.md)** - Detailed configuration options for different environments
-- **[Troubleshooting Guide](docs/TROUBLESHOOTING.md)** - Common issues and solutions
+- **[Configuration Guide](docs/_quickstart/configuration.md)** - Detailed configuration options for different environments
+- **[Troubleshooting Guide](docs/_developers/TROUBLESHOOTING.md)** - Common issues and solutions
 - **[Developer Documentation](docs/developers/)** - For contributors and developers
 
 ## 📋 Support
 
 For help and support:
-- Check the [Troubleshooting Guide](docs/TROUBLESHOOTING.md)
+- Check the [Troubleshooting Guide](docs/_developers/TROUBLESHOOTING.md)
 - Search [existing issues](https://github.com/schirmer-lab/metagear/issues)
 - Create a [new issue](https://github.com/schirmer-lab/metagear/issues/new) if needed
