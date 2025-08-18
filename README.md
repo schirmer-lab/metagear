@@ -9,7 +9,7 @@ This is a command-line wrapper for the MetaGEAR Pipeline for high-throughput mic
 3. **Download databases**: `metagear download_databases`
 4. **Run workflows**: `metagear qc_dna --input samples.csv`
 
-For detailed instructions, see the [Quick Start Guide](docs/_quickstart/index.md).
+For detailed instructions, see the [Quick Start Guide](https://schirmer-lab.github.io/metagear/).
 
 ---
 
