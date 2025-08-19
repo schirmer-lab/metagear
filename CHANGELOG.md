@@ -8,6 +8,20 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+
+### Changed
+
+### Deprecated
+
+### Removed
+
+### Fixed
+
+### Security
+
+## [1.0.1] - 2025-08-20
+
+### Added
 - Automatic detection and installation of latest MetaGEAR Pipeline release
 - Version specification support via `--pipeline` parameter (e.g., `--pipeline 1.0`)
 - Validation of specified versions against GitHub releases
@@ -53,3 +67,6 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 [Unreleased]: https://github.com/schirmer-lab/metagear/compare/v1.0.0...HEAD
 [1.0.0]: https://github.com/schirmer-lab/metagear/releases/tag/v1.0.0
+
+[Unreleased]: https://github.com/schirmer-lab/metagear/compare/v1.0.1...HEAD
+[1.0.1]: https://github.com/schirmer-lab/metagear/releases/tag/v1.0.1
