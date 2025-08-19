@@ -16,9 +16,9 @@
     temp_dir=$(mktemp -d)/metagear
     mkdir -p "$temp_dir"
 
-    # 2) Call install.sh with --install-dir
+    # 2) Call install.sh with --install-dir, specifying a version to avoid network calls
     install_script="$BATS_TEST_DIRNAME/../install.sh"
-    run bash "$install_script" --install-dir "$temp_dir"
+    run bash "$install_script" --install-dir "$temp_dir" --pipeline "1.0"
 
     # 3) Check that installation completed successfully
     [ "$status" -eq 0 ]
@@ -50,9 +50,9 @@
     echo "# Original config content" > "$temp_dir/metagear.config"
     echo "# Original env content" > "$temp_dir/metagear.env"
 
-    # 3) Call install.sh with --install-dir
+    # 3) Call install.sh with --install-dir, specifying a version to avoid network calls
     install_script="$BATS_TEST_DIRNAME/../install.sh"
-    run bash "$install_script" --install-dir "$temp_dir"
+    run bash "$install_script" --install-dir "$temp_dir" --pipeline "1.0"
 
     # 4) Check that installation completed successfully
     [ "$status" -eq 0 ]
@@ -90,9 +90,9 @@
     rm -rf "$temp_dir"/*
     rm -rf "$temp_dir"/.* 2>/dev/null || true
 
-    # 2) Call install.sh with --install-dir (no existing config files)
+    # 2) Call install.sh with --install-dir (no existing config files), specifying a version to avoid network calls
     install_script="$BATS_TEST_DIRNAME/../install.sh"
-    run bash "$install_script" --install-dir "$temp_dir"
+    run bash "$install_script" --install-dir "$temp_dir" --pipeline "1.0"
 
     # 3) Check that installation completed successfully
     [ "$status" -eq 0 ]
@@ -131,9 +131,9 @@
     echo "# Original config content" > "$temp_dir/metagear.config"
     # Note: metagear.env does not exist
 
-    # 3) Call install.sh with --install-dir
+    # 3) Call install.sh with --install-dir, specifying a version to avoid network calls
     install_script="$BATS_TEST_DIRNAME/../install.sh"
-    run bash "$install_script" --install-dir "$temp_dir"
+    run bash "$install_script" --install-dir "$temp_dir" --pipeline "1.0"
 
     # 4) Check that installation completed successfully
     [ "$status" -eq 0 ]
@@ -154,4 +154,89 @@
     cd "$original_dir"
     rm -rf "$temp_dir"
     rm -rf "$temp_work_dir"
+}
+
+@test "install.sh accepts specific version via --pipeline" {
+    # 0) Create and change to temporary working directory
+    temp_work_dir=$(mktemp -d)
+    original_dir="$PWD"
+    cd "$temp_work_dir"
+
+    # 1) Create temporary directory
+    temp_dir=$(mktemp -d)/metagear
+    mkdir -p "$temp_dir"
+
+    # 2) Call install.sh with --pipeline specifying a version
+    install_script="$BATS_TEST_DIRNAME/../install.sh"
+    run bash "$install_script" --install-dir "$temp_dir" --pipeline "1.0"
+
+    # 3) Check that installation completed successfully
+    [ "$status" -eq 0 ]
+
+    # 4) Check that output mentions the correct version
+    [[ "$output" =~ "Version 1.0 confirmed" ]]
+    [[ "$output" =~ "install MetaGEAR v1.0" ]]
+
+    # Clean up
+    cd "$original_dir"
+    rm -rf "$temp_dir"
+    rm -rf "$temp_work_dir"
+}
+
+@test "install.sh still accepts directory path via --pipeline" {
+    # 0) Create and change to temporary working directory
+    temp_work_dir=$(mktemp -d)
+    original_dir="$PWD"
+    cd "$temp_work_dir"
+
+    # 1) Create temporary directory and mock pipeline directory
+    temp_dir=$(mktemp -d)/metagear
+    mkdir -p "$temp_dir"
+    mock_pipeline_dir=$(mktemp -d)
+    mkdir -p "$mock_pipeline_dir/conf"
+    echo "mock pipeline" > "$mock_pipeline_dir/conf/base.config"
+
+    # 2) Call install.sh with --pipeline specifying a directory path
+    install_script="$BATS_TEST_DIRNAME/../install.sh"
+    run bash "$install_script" --install-dir "$temp_dir" --pipeline "$mock_pipeline_dir"
+
+    # 3) Check that installation completed successfully
+    [ "$status" -eq 0 ]
+
+    # 4) Check that output mentions using custom directory
+    [[ "$output" =~ "install MetaGEAR from local path:" ]]
+    [[ "$output" =~ "Using custom pipeline directory:" ]]
+
+    # Clean up
+    cd "$original_dir"
+    rm -rf "$temp_dir"
+    rm -rf "$temp_work_dir"
+    rm -rf "$mock_pipeline_dir"
+}
+
+@test "install.sh shows help with --help" {
+    install_script="$BATS_TEST_DIRNAME/../install.sh"
+    run bash "$install_script" --help
+
+    # Check that command succeeded
+    [ "$status" -eq 0 ]
+
+    # Check that help output contains expected elements
+    [[ "$output" =~ "MetaGEAR Installation Script" ]]
+    [[ "$output" =~ "Usage:" ]]
+    [[ "$output" =~ "--pipeline <path|version>" ]]
+    [[ "$output" =~ "Install latest release" ]]
+    [[ "$output" =~ "Install specific version" ]]
+}
+
+@test "install.sh shows help with -h" {
+    install_script="$BATS_TEST_DIRNAME/../install.sh"
+    run bash "$install_script" -h
+
+    # Check that command succeeded
+    [ "$status" -eq 0 ]
+
+    # Check that help output contains expected elements
+    [[ "$output" =~ "MetaGEAR Installation Script" ]]
+    [[ "$output" =~ "Usage:" ]]
 }

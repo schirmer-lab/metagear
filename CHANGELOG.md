@@ -8,9 +8,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ## [Unreleased]
 
 ### Added
+- Automatic detection and installation of latest MetaGEAR Pipeline release
+- Version specification support via `--pipeline` parameter (e.g., `--pipeline 1.0`)
+- Validation of specified versions against GitHub releases
+- Enhanced `--pipeline` parameter to accept both directory paths and version numbers
 
 ### Changed
 - Now using MetaGEAR Pipeline v1.0 (previously v.0.1.1)
+- Installation script now defaults to latest release instead of hardcoded version
+- `--pipeline` parameter help text updated to reflect new dual functionality
 
 ### Deprecated
 
