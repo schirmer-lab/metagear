@@ -1,6 +1,8 @@
 # MetaGEAR
 
-This is a command-line wrapper for the MetaGEAR Pipeline for high-throughput microbiome metagenomic analysis. It provides easy-to-use tools for installing, configuring, and launching the MetaGEAR Pipeline—a Nextflow/NF-Core pipeline that streamlines end-to-end microbiome metagenomic workflows from raw reads to functional annotation.
+This is a command-l## Installatio# MetaGEAR
+
+A command-line wrapper for the MetaGEAR Pipeline for high-throughput microbiome metagenomic analysis. It provides easy-to-use tools for installing, configuring, and launching the MetaGEAR Pipeline—a Nextflow/NF-Core pipeline that streamlines end-to-end microbiome metagenomic workflows from raw reads to functional annotation.
 
 ## 🚀 Quick Start
 
@@ -9,7 +11,7 @@ This is a command-line wrapper for the MetaGEAR Pipeline for high-throughput mic
 3. **Download databases**: `metagear download_databases`
 4. **Run workflows**: `metagear qc_dna --input samples.csv`
 
-For detailed instructions, see the [Quick Start Guide](https://schirmer-lab.github.io/metagear/).
+For detailed instructions, see the [📖 Full Documentation](https://schirmer-lab.github.io/metagear/).
 
 ---
 
@@ -31,98 +33,72 @@ For detailed instructions, see the [Quick Start Guide](https://schirmer-lab.gith
 
 ## Installation
 
-To install the MetaGEAR Pipeline Wrapper, just run:
-
+Install the latest release automatically:
 ```bash
 curl -L http://get-metagear.schirmerlab.de | bash
 ```
 
-The installer sets resource limits to roughly 80% of your available CPUs and RAM (capped at 48 CPUs and 80 GB). Review `~/.metagear/metagear.config` and `~/.metagear/metagear.env` before running any workflow.
-
-## Post-installation steps (Important)
-
-### Runner Selection
-The default runner is Docker. However, we highly encourage Singularity or Apptainer to be used. Please decide what runner you want to use and set the default value in `~/.metagear/metagear.config`. For example:
-
-```
-#!/usr/bin/env bash
-
-export NXF_SINGULARITY_CACHEDIR=/where/do/you/want/the/images/downloaded
-
-# Please use this for singularity (or docker,docker_custom for Docker)
-RUN_PROFILES="-profile singularity,singularity_custom"
-NF_WORK="./nf_work"
+Install a specific version:
+```bash
+curl -L http://get-metagear.schirmerlab.de | bash -s -- --pipeline 1.0
 ```
 
-### Filesystem Configuration
-By default, filesystems like `/nfs`, `/lustre`, or other non-standard mount points are usually not mounted automatically. Please make sure you include them in `~/.metagear/metagear.config` before running any workflow. For example:
+The installer automatically finds the latest release and sets resource limits to roughly 80% of your available CPUs and RAM (capped at 48 CPUs and 80 GB).
 
-```
-/* --------------------------------------------------------------*/
-/* --- PLEASE UPDATE THESE PARAMETERS BEFORE RUNNING METAGEAR ---*/
-/* --------------------------------------------------------------*/
+**⚠️ Important**: Review and customize `~/.metagear/metagear.config` and `~/.metagear/metagear.env` before running workflows.
 
-profiles {
-    singularity_custom {
-        singularity.runOptions = "--writable-tmpfs -B /nfs/mydata:/nfs/mydata -B /:/"
+➡️ **See [Installation Guide](https://schirmer-lab.github.io/metagear/quick-start/installation/) for detailed setup instructions**
 
-        process {
-            maxForks = 5
-        }
-    }
-    docker_custom {
-        docker.runOptions = '-u $(id -u):$(id -g) -v /nfs/mydata:/nfs/mydata'
-    }
-}
-```
+## Basic Usage
 
-For better resource control, a `maxForks` parameter can be adjusted for all processes. This will determine the number of parallel processes that can be executed at a given time. Keep in mind that each process can request a certain number of CPUs and RAM, this is important to consider when dealing with oversubscription or memory problems.
-
-## Usage
-
-MetaGEAR requires 3 databases: Kneaddata, MetaPhlAn, HUMAnN. These can be downloaded by running the command:
+Download required databases:
 ```bash
 metagear download_databases
 ```
 
-To run the QC and Microbial Profiles workflows (output directory defaults to `./results` when `--outdir` is not specified):
+Run workflows:
 ```bash
 metagear qc_dna --input samples.csv
 metagear microbial_profiles --input samples.csv
-metagear qc_dna --input samples.csv -preview   # generate script only
 ```
 
-### Preview mode:
-
-Running with `-preview` prints the generated script instead of executing it.
-For instance, when running
+Generate scripts without execution (preview mode):
 ```bash
 metagear qc_dna --input samples.csv -preview
 ```
-The file `metagear_qc_dna.sh` is generated in the current directory and can
-be executed manually, or the command can be re-run without `-preview` to directly run the pipeline.
 
-### Input format
-
-
-The input file should look like this:
-```
+Input CSV format:
+```csv
 sample,fastq_1,fastq_2
 SAMPLE-01,/path/to/sample1_R1.fastq.gz,/path/to/sample1_R2.fastq.gz
 SAMPLE-02,/path/to/sample2_R1.fastq.gz,/path/to/sample2_R2.fastq.gz
 ```
 
+➡️ **See [Usage Guide](https://schirmer-lab.github.io/metagear/quick-start/usage/) for complete workflow documentation**
+
 ---
 
 ## 📖 Documentation
 
-- **[Configuration Guide](docs/_quickstart/configuration.md)** - Detailed configuration options for different environments
-- **[Troubleshooting Guide](docs/_developers/TROUBLESHOOTING.md)** - Common issues and solutions
-- **[Developer Documentation](docs/developers/)** - For contributors and developers
+**Essential Guides:**
+- 🚀 [Quick Start](https://schirmer-lab.github.io/metagear/) - Get up and running fast
+- ⚙️ [Installation](https://schirmer-lab.github.io/metagear/quick-start/installation/) - Detailed installation options
+- 🔧 [Configuration](https://schirmer-lab.github.io/metagear/quick-start/configuration/) - Environment-specific setup
+- 📋 [Usage Examples](https://schirmer-lab.github.io/metagear/quick-start/usage/) - Workflow examples and parameters
+
+**Advanced Topics:**
+- 🔬 [Workflows](https://schirmer-lab.github.io/metagear/workflows/) - Detailed workflow documentation
+- 🛠️ [Development](https://schirmer-lab.github.io/metagear/developers/) - For contributors and developers
+<!-- - 🐛 [Troubleshooting](https://schirmer-lab.github.io/metagear/developers/TROUBLESHOOTING/) - Common issues and solutions -->
 
 ## 📋 Support
 
 For help and support:
-- Check the [Troubleshooting Guide](docs/_developers/TROUBLESHOOTING.md)
-- Search [existing issues](https://github.com/schirmer-lab/metagear/issues)
-- Create a [new issue](https://github.com/schirmer-lab/metagear/issues/new) if needed
+- 📖 Check the [Documentation](https://schirmer-lab.github.io/metagear/)
+- 🐛 Browse the MetaGEAR Pipeline [existing issues](https://github.com/schirmer-lab/metagear-pipeline)
+
+---
+
+## 📄 License
+
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.

@@ -51,7 +51,7 @@ wrapper to execute your local code.
 The `install.sh` script accepts the following optional parameters:
 
 - `--install-dir <path>` – Specify a custom installation directory (default: `~/.metagear`)
-- `--pipeline <path>` – Use a local pipeline directory for development instead of downloading from GitHub
+- `--pipeline <path|version>` – Use a local pipeline directory for development OR specify a specific version to install
 - `--utilities <path>` – Use a custom wrapper repository path instead of the default repository
 
 ### Examples
@@ -60,12 +60,26 @@ The `install.sh` script accepts the following optional parameters:
 # Install with custom directory
 ./install.sh --install-dir /opt/metagear
 
+# Install a specific version
+./install.sh --pipeline 1.0
+
 # Install with local pipeline for development
 ./install.sh --pipeline /path/to/local/metagear-pipeline
 
 # Install with custom utilities repository
 ./install.sh --utilities /path/to/custom/wrapper
 ```
+
+### Version Management
+
+The installer automatically:
+- Detects and installs the latest available release when no version is specified
+- Validates that specified versions exist as GitHub releases
+- Falls back to version 1.0 if the latest release cannot be determined
+
+The `--pipeline` parameter is flexible:
+- **Directory path**: Creates a symbolic link to the local pipeline (for development)
+- **Version string**: Downloads and installs the specified release version
 
 ## Testing
 
