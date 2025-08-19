@@ -6,13 +6,80 @@ YELLOW=$(tput setaf 3)
 GREEN=$(tput setaf 2)
 RESET=$(tput sgr0)
 
+# Function to show usage information
+show_usage() {
+    echo "MetaGEAR Installation Script"
+    echo ""
+    echo "Usage: $0 [OPTIONS]"
+    echo ""
+    echo "Options:"
+    echo "  --install-dir <path>     Specify custom installation directory (default: ~/.metagear)"
+    echo "  --pipeline <path|version> Use local pipeline directory OR specify version to install"
+    echo "                           Examples: --pipeline /path/to/pipeline OR --pipeline 1.0"
+    echo "  --utilities <path>       Use custom utilities repository path"
+    echo "  --help, -h              Show this help message"
+    echo ""
+    echo "Examples:"
+    echo "  $0                                    # Install latest release"
+    echo "  $0 --pipeline 1.0                    # Install specific version"
+    echo "  $0 --pipeline /path/to/pipeline       # Use local development pipeline"
+    echo "  $0 --install-dir /opt/metagear        # Custom installation directory"
+    echo ""
+}
+
 # 1) Config
 INSTALL_DIR="${HOME}/.metagear"
 ORGANIZATION="schirmer-lab"
 PIPELINE_REPOSITORY="metagear-pipeline"
-PIPELINE_VERSION=1.0
+PIPELINE_VERSION=""  # Will be set to latest release or user-specified version
 UTILS_REPOSITORY="metagear"
 SCRIPT="main.sh"
+
+# Function to get the latest release version from GitHub API
+get_latest_release() {
+    local org="$1"
+    local repo="$2"
+    local api_url="https://api.github.com/repos/${org}/${repo}/releases/latest"
+    
+    # Try to get latest release using wget
+    if command -v wget >/dev/null 2>&1; then
+        latest_version=$(wget -qO- "$api_url" 2>/dev/null | grep '"tag_name":' | sed -E 's/.*"tag_name": *"([^"]+)".*/\1/' | head -1)
+    elif command -v curl >/dev/null 2>&1; then
+        latest_version=$(curl -s "$api_url" 2>/dev/null | grep '"tag_name":' | sed -E 's/.*"tag_name": *"([^"]+)".*/\1/' | head -1)
+    else
+        echo "Error: Neither wget nor curl is available for downloading" >&2
+        return 1
+    fi
+    
+    if [[ -n "$latest_version" ]]; then
+        echo "$latest_version"
+        return 0
+    else
+        echo "Error: Could not retrieve latest release information" >&2
+        return 1
+    fi
+}
+
+# Function to check if a version exists as a release
+check_version_exists() {
+    local org="$1"
+    local repo="$2"
+    local version="$3"
+    local api_url="https://api.github.com/repos/${org}/${repo}/releases/tags/${version}"
+    
+    # Try to check if version exists using wget
+    if command -v wget >/dev/null 2>&1; then
+        if wget -q --spider "$api_url" 2>/dev/null; then
+            return 0
+        fi
+    elif command -v curl >/dev/null 2>&1; then
+        if curl -s --head "$api_url" | head -n 1 | grep -q "200 OK"; then
+            return 0
+        fi
+    fi
+    
+    return 1
+}
 
 WRAPPER_NAME="metagear"
 WRAPPER_PATH="${PWD}/${WRAPPER_NAME}"
@@ -26,6 +93,10 @@ CUSTOM_UTILS_PATH=""
 # Parse optional arguments
 while [[ $# -gt 0 ]]; do
   case "$1" in
+    --help|-h)
+      show_usage
+      exit 0
+      ;;
     --install-dir)
       shift
       if [[ $# -eq 0 ]]; then
@@ -38,10 +109,17 @@ while [[ $# -gt 0 ]]; do
     --pipeline)
       shift
       if [[ $# -eq 0 ]]; then
-        echo "Error: --pipeline requires a path argument" >&2
+        echo "Error: --pipeline requires a path or version argument" >&2
         exit 1
       fi
-      CUSTOM_PIPELINE_PATH="$(realpath "$1")"
+      # Check if the argument is a directory path or a version
+      if [[ -d "$1" ]]; then
+        # It's a directory path
+        CUSTOM_PIPELINE_PATH="$(realpath "$1")"
+      else
+        # It's a version specification
+        PIPELINE_VERSION="$1"
+      fi
       shift
       ;;
     --utilities)
@@ -55,10 +133,30 @@ while [[ $# -gt 0 ]]; do
       ;;
     *)
       echo "Unknown option: $1" >&2
+      echo "Use --help for usage information" >&2
       exit 1
       ;;
   esac
 done
+
+# Set PIPELINE_VERSION to latest release if not specified
+if [[ -z "$PIPELINE_VERSION" && -z "$CUSTOM_PIPELINE_PATH" ]]; then
+    echo "Getting latest release information..."
+    if PIPELINE_VERSION=$(get_latest_release "$ORGANIZATION" "$PIPELINE_REPOSITORY"); then
+        echo "Found latest release: $PIPELINE_VERSION"
+    else
+        echo "Warning: Could not get latest release, falling back to version 1.0"
+        PIPELINE_VERSION="1.0"
+    fi
+elif [[ -n "$PIPELINE_VERSION" && -z "$CUSTOM_PIPELINE_PATH" ]]; then
+    # Validate that the specified version exists
+    echo "Checking if version $PIPELINE_VERSION exists..."
+    if ! check_version_exists "$ORGANIZATION" "$PIPELINE_REPOSITORY" "$PIPELINE_VERSION"; then
+        echo "Error: Version $PIPELINE_VERSION does not exist as a release" >&2
+        exit 1
+    fi
+    echo "Version $PIPELINE_VERSION confirmed"
+fi
 
 
 # 2) Prepare install directory
@@ -67,7 +165,11 @@ mkdir -p "${INSTALL_DIR}"/downloads
 
 # Welcome message
 echo "Welcome to the MetaGEAR installation script!"
-echo "This script will install MetaGEAR v${PIPELINE_VERSION} and its utilities."
+if [[ -n "$CUSTOM_PIPELINE_PATH" ]]; then
+    echo "This script will install MetaGEAR from local path: $CUSTOM_PIPELINE_PATH"
+else
+    echo "This script will install MetaGEAR v${PIPELINE_VERSION} and its utilities."
+fi
 echo ""
 
 # 3) Install utilities
