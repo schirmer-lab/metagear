@@ -30,30 +30,12 @@ You can install a specific version by specifying it with the `--pipeline` parame
 curl -L http://get-metagear.schirmerlab.de | bash -s -- --pipeline 1.0
 ```
 
-### Local Development
-For development purposes, you can use a local pipeline directory:
-
-```bash
-./install.sh --pipeline /path/to/local/metagear-pipeline
-```
-
 The installer sets resource limits to roughly 80% of your available CPUs and RAM (capped at 48 CPUs and 80 GB). Review `~/.metagear/metagear.config` and `~/.metagear/metagear.env` before running any workflow.lt
 title: Installation
 parent: Quick start
 nav_order: 1
 permalink: /quick-start/installation/
 ---
-
-# Installation
-
-To install the MetaGEAR Pipeline Wrapper, simply run:
-
-```bash
-curl -L http://get-metagear.schirmerlab.de | bash
-```
-
-The installer sets resource limits to roughly 80% of your available CPUs and RAM (capped at 48 CPUs and 80 GB). Review `~/.metagear/metagear.config` and `~/.metagear/metagear.env` before running any workflow.
-
 
 ## Post-installation steps
 
